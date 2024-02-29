@@ -1,0 +1,119 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<reservations>
+  <reservation>
+    <firstName>john</firstName>
+    <lastName>wayne </lastName>
+    <flightCode>a134ds</flightCode>
+    <pnr>er13rl</pnr>
+    <passengerPhoneNumber>+** (***) ***-****</passengerPhoneNumber>
+    <homeCountry>usa</homeCountry>
+    <flight code="A134DS">
+      <price>+750.00</price>
+      <availableSeats>+50.00</availableSeats>
+      <planeType/>
+      <departureDate>apr 11, 2018</departureDate>
+      <origination>mua</origination>
+      <airlineName>delta</airlineName>
+      <destination>
+        <airportCode>lax</airportCode>
+        <airportName>los angeles international airport</airportName>
+        <city>los angeles</city>
+        <country>united states</country>
+        <iata>lax</iata>
+        <longitude>33.943</longitude>
+        <latitude>-118.408</latitude>
+        <altitude>+125.00</altitude>
+        <timeZone>-8</timeZone>
+        <dst>a</dst>
+        <timeZone>america/los_angeles</timeZone>
+      </destination>
+    </flight>
+  </reservation>
+  <reservation>
+    <firstName>andrea</firstName>
+    <lastName>schmidt</lastName>
+    <flightCode>ffee0192</flightCode>
+    <pnr>byr2rt</pnr>
+    <passengerPhoneNumber>+** (***) ***-****</passengerPhoneNumber>
+    <homeCountry>germany</homeCountry>
+    <flight code="ffee0192">
+      <price>+300.00</price>
+      <availableSeats>+0.00</availableSeats>
+      <planeType>boeing 777</planeType>
+      <departureDate>2018-01-20t00:00:00</departureDate>
+      <origination>mua</origination>
+      <airlineName>american airlines</airlineName>
+      <destination>
+        <airportCode>lax</airportCode>
+        <airportName>los angeles international airport</airportName>
+        <city>los angeles</city>
+        <country>united states</country>
+        <iata>lax</iata>
+        <longitude>33.943</longitude>
+        <latitude>-118.408</latitude>
+        <altitude>+125.00</altitude>
+        <timeZone>-8</timeZone>
+        <dst>a</dst>
+        <timeZone>america/los_angeles</timeZone>
+      </destination>
+    </flight>
+  </reservation>
+  <reservation>
+    <firstName>ravindra</firstName>
+    <lastName>jadeja</lastName>
+    <flightCode>er0945</flightCode>
+    <pnr>jjyrtw</pnr>
+    <passengerPhoneNumber>+** (***) ***-****</passengerPhoneNumber>
+    <homeCountry>india</homeCountry>
+    <flight code="ER0945">
+      <airlineName>united</airlineName>
+      <availableSeats>+0.00</availableSeats>
+      <departureDate>2018/06/11</departureDate>
+      <destination>
+        <airportCode>lax</airportCode>
+        <airportName>los angeles international airport</airportName>
+        <city>los angeles</city>
+        <country>united states</country>
+        <iata>lax</iata>
+        <longitude>33.943</longitude>
+        <latitude>-118.408</latitude>
+        <altitude>+125.00</altitude>
+        <timeZone>-8</timeZone>
+        <dst>a</dst>
+        <timeZone>america/los_angeles</timeZone>
+      </destination>
+      <origination>mua</origination>
+      <planeType>boeing 707</planeType>
+      <price>+423.00</price>
+    </flight>
+  </reservation>
+  <reservation>
+    <firstName>kiruba</firstName>
+    <lastName>munusamy</lastName>
+    <flightCode>a134ds</flightCode>
+    <pnr>dl1yaa</pnr>
+    <passengerPhoneNumber>+** (***) ***-****</passengerPhoneNumber>
+    <homeCountry>india</homeCountry>
+    <flight code="A134DS">
+      <price>+750.00</price>
+      <availableSeats>+50.00</availableSeats>
+      <planeType>boeing 777</planeType>
+      <departureDate>apr 11, 2018</departureDate>
+      <origination>mua</origination>
+      <airlineName>delta</airlineName>
+      <destination>
+        <airportCode>lax</airportCode>
+        <airportName>los angeles international airport</airportName>
+        <city>los angeles</city>
+        <country>united states</country>
+        <iata>lax</iata>
+        <longitude>33.943</longitude>
+        <latitude>-118.408</latitude>
+        <altitude>+125.00</altitude>
+        <timeZone>-8</timeZone>
+        <dst>a</dst>
+        <timeZone>america/los_angeles</timeZone>
+      </destination>
+    </flight>
+  </reservation>
+</reservations>

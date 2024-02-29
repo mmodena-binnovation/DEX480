@@ -1,0 +1,237 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<flights>
+  <flight>
+    <airlineName>Delta</airlineName>
+    <availableSeats>40</availableSeats>
+    <departureDate>Apr 11, 2018</departureDate>
+    <destination>
+      <airportCode>LAX</airportCode>
+      <openFlightsAirportId>3484</openFlightsAirportId>
+      <airportName>Los Angeles International Airport</airportName>
+      <city>Los Angeles</city>
+      <country>United States</country>
+      <IATA>LAX</IATA>
+      <ICAO>KLAX</ICAO>
+      <longitude>33.94250107</longitude>
+      <latitude>-118.4079971</latitude>
+      <altitude>125</altitude>
+      <timeZone>-8</timeZone>
+      <DST>A</DST>
+      <timeZone>America/Los_Angeles</timeZone>
+      <type>airport</type>
+      <source>OurAirports</source>
+    </destination>
+    <flightCode>A134DS</flightCode>
+    <origination>MUA</origination>
+    <planeType>BOEING 777</planeType>
+    <price>750.00</price>
+  </flight>
+  <flight>
+    <airlineName>Delta</airlineName>
+    <availableSeats>18</availableSeats>
+    <departureDate>Aug 11, 2018</departureDate>
+    <destination>
+      <airportCode>LAX</airportCode>
+      <openFlightsAirportId>3484</openFlightsAirportId>
+      <airportName>Los Angeles International Airport</airportName>
+      <city>Los Angeles</city>
+      <country>United States</country>
+      <IATA>LAX</IATA>
+      <ICAO>KLAX</ICAO>
+      <longitude>33.94250107</longitude>
+      <latitude>-118.4079971</latitude>
+      <altitude>125</altitude>
+      <timeZone>-8</timeZone>
+      <DST>A</DST>
+      <timeZone>America/Los_Angeles</timeZone>
+      <type>airport</type>
+      <source>OurAirports</source>
+    </destination>
+    <flightCode>A1QWER</flightCode>
+    <origination>MUA</origination>
+    <planeType>BOEING 747</planeType>
+    <price>496.00</price>
+  </flight>
+  <flight>
+    <airlineName>Delta</airlineName>
+    <availableSeats>10</availableSeats>
+    <departureDate>Feb 11, 2018</departureDate>
+    <destination>
+      <airportCode>LAX</airportCode>
+      <openFlightsAirportId>3484</openFlightsAirportId>
+      <airportName>Los Angeles International Airport</airportName>
+      <city>Los Angeles</city>
+      <country>United States</country>
+      <IATA>LAX</IATA>
+      <ICAO>KLAX</ICAO>
+      <longitude>33.94250107</longitude>
+      <latitude>-118.4079971</latitude>
+      <altitude>125</altitude>
+      <timeZone>-8</timeZone>
+      <DST>A</DST>
+      <timeZone>America/Los_Angeles</timeZone>
+      <type>airport</type>
+      <source>OurAirports</source>
+    </destination>
+    <flightCode>A1B2C4</flightCode>
+    <origination>MUA</origination>
+    <planeType>BOEING 737</planeType>
+    <price>199.99</price>
+  </flight>
+  <flight>
+    <flightCode>rree0001</flightCode>
+    <availableSeats>0</availableSeats>
+    <destination>
+      <airportCode>LAX</airportCode>
+      <openFlightsAirportId>3484</openFlightsAirportId>
+      <airportName>Los Angeles International Airport</airportName>
+      <city>Los Angeles</city>
+      <country>United States</country>
+      <IATA>LAX</IATA>
+      <ICAO>KLAX</ICAO>
+      <longitude>33.94250107</longitude>
+      <latitude>-118.4079971</latitude>
+      <altitude>125</altitude>
+      <timeZone>-8</timeZone>
+      <DST>A</DST>
+      <timeZone>America/Los_Angeles</timeZone>
+      <type>airport</type>
+      <source>OurAirports</source>
+    </destination>
+    <planeType>Boeing 787</planeType>
+    <price>541</price>
+    <origination>MUA</origination>
+    <departureDate>2016-01-20T00:00:00</departureDate>
+    <airlineName>american</airlineName>
+  </flight>
+  <flight>
+    <flightCode>ffee0192</flightCode>
+    <availableSeats>0</availableSeats>
+    <destination>
+      <airportCode>LAX</airportCode>
+      <openFlightsAirportId>3484</openFlightsAirportId>
+      <airportName>Los Angeles International Airport</airportName>
+      <city>Los Angeles</city>
+      <country>United States</country>
+      <IATA>LAX</IATA>
+      <ICAO>KLAX</ICAO>
+      <longitude>33.94250107</longitude>
+      <latitude>-118.4079971</latitude>
+      <altitude>125</altitude>
+      <timeZone>-8</timeZone>
+      <DST>A</DST>
+      <timeZone>America/Los_Angeles</timeZone>
+      <type>airport</type>
+      <source>OurAirports</source>
+    </destination>
+    <planeType>Boeing 777</planeType>
+    <price>300</price>
+    <origination>MUA</origination>
+    <departureDate>2016-01-20T00:00:00</departureDate>
+    <airlineName>american</airlineName>
+  </flight>
+  <flight>
+    <flightCode>eefd4511</flightCode>
+    <availableSeats>100</availableSeats>
+    <destination>
+      <airportCode>LAX</airportCode>
+      <openFlightsAirportId>3484</openFlightsAirportId>
+      <airportName>Los Angeles International Airport</airportName>
+      <city>Los Angeles</city>
+      <country>United States</country>
+      <IATA>LAX</IATA>
+      <ICAO>KLAX</ICAO>
+      <longitude>33.94250107</longitude>
+      <latitude>-118.4079971</latitude>
+      <altitude>125</altitude>
+      <timeZone>-8</timeZone>
+      <DST>A</DST>
+      <timeZone>America/Los_Angeles</timeZone>
+      <type>airport</type>
+      <source>OurAirports</source>
+    </destination>
+    <planeType>Boeing 777</planeType>
+    <price>900</price>
+    <origination>MUA</origination>
+    <departureDate>2016-01-15T00:00:00</departureDate>
+    <airlineName>american</airlineName>
+  </flight>
+  <flight>
+    <airlineName>United</airlineName>
+    <availableSeats>52</availableSeats>
+    <departureDate>2015/02/11</departureDate>
+    <destination>
+      <airportCode>LAX</airportCode>
+      <openFlightsAirportId>3484</openFlightsAirportId>
+      <airportName>Los Angeles International Airport</airportName>
+      <city>Los Angeles</city>
+      <country>United States</country>
+      <IATA>LAX</IATA>
+      <ICAO>KLAX</ICAO>
+      <longitude>33.94250107</longitude>
+      <latitude>-118.4079971</latitude>
+      <altitude>125</altitude>
+      <timeZone>-8</timeZone>
+      <DST>A</DST>
+      <timeZone>America/Los_Angeles</timeZone>
+      <type>airport</type>
+      <source>OurAirports</source>
+    </destination>
+    <flightCode>ER45if</flightCode>
+    <origination>MUA</origination>
+    <planeType>Boeing 737</planeType>
+    <price>345.99</price>
+  </flight>
+  <flight>
+    <airlineName>United</airlineName>
+    <availableSeats>12</availableSeats>
+    <departureDate>2015/04/11</departureDate>
+    <destination>
+      <airportCode>LAX</airportCode>
+      <openFlightsAirportId>3484</openFlightsAirportId>
+      <airportName>Los Angeles International Airport</airportName>
+      <city>Los Angeles</city>
+      <country>United States</country>
+      <IATA>LAX</IATA>
+      <ICAO>KLAX</ICAO>
+      <longitude>33.94250107</longitude>
+      <latitude>-118.4079971</latitude>
+      <altitude>125</altitude>
+      <timeZone>-8</timeZone>
+      <DST>A</DST>
+      <timeZone>America/Los_Angeles</timeZone>
+      <type>airport</type>
+      <source>OurAirports</source>
+    </destination>
+    <flightCode>ER45jd</flightCode>
+    <origination>MUA</origination>
+    <planeType>Boeing 777</planeType>
+    <price>346</price>
+  </flight>
+  <flight>
+    <airlineName>United</airlineName>
+    <availableSeats>0</availableSeats>
+    <departureDate>2015/06/11</departureDate>
+    <destination>
+      <airportCode>LAX</airportCode>
+      <openFlightsAirportId>3484</openFlightsAirportId>
+      <airportName>Los Angeles International Airport</airportName>
+      <city>Los Angeles</city>
+      <country>United States</country>
+      <IATA>LAX</IATA>
+      <ICAO>KLAX</ICAO>
+      <longitude>33.94250107</longitude>
+      <latitude>-118.4079971</latitude>
+      <altitude>125</altitude>
+      <timeZone>-8</timeZone>
+      <DST>A</DST>
+      <timeZone>America/Los_Angeles</timeZone>
+      <type>airport</type>
+      <source>OurAirports</source>
+    </destination>
+    <flightCode>ER0945</flightCode>
+    <origination>MUA</origination>
+    <planeType>Boeing 707</planeType>
+    <price>423</price>
+  </flight>
+</flights>

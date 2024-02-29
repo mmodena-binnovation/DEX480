@@ -1,0 +1,119 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<reservations>
+  <reservation>
+    <firstName>John</firstName>
+    <lastName>Wayne </lastName>
+    <pnr>ER13RL</pnr>
+    <passengerPhoneNumber>+1 (202) 345-2945</passengerPhoneNumber>
+    <homeCountry>USA</homeCountry>
+    <flight code="A134DS">
+      <airlineName>Delta</airlineName>
+      <availableSeats>40</availableSeats>
+      <departureDate>Apr 11, 2018</departureDate>
+      <destination>
+        <airportCode>LAX</airportCode>
+        <airportName>Los Angeles International Airport</airportName>
+        <city>Los Angeles</city>
+        <country>United States</country>
+        <IATA>LAX</IATA>
+        <ICAO>KLAX</ICAO>
+        <longitude>33.94250107</longitude>
+        <latitude>-118.4079971</latitude>
+        <altitude>125</altitude>
+        <timeZone>-8</timeZone>
+        <DST>A</DST>
+        <timeZone>America/Los_Angeles</timeZone>
+      </destination>
+      <origination>MUA</origination>
+      <planeType>BOEING 777</planeType>
+      <price>750.00</price>
+    </flight>
+  </reservation>
+  <reservation>
+    <firstName>Andrea</firstName>
+    <lastName>Schmidt</lastName>
+    <pnr>BYR2RT</pnr>
+    <passengerPhoneNumber>+49 800 1822338</passengerPhoneNumber>
+    <homeCountry>Germany</homeCountry>
+    <flight code="ffee0192">
+      <availableSeats>0</availableSeats>
+      <destination>
+        <airportCode>LAX</airportCode>
+        <airportName>Los Angeles International Airport</airportName>
+        <city>Los Angeles</city>
+        <country>United States</country>
+        <IATA>LAX</IATA>
+        <ICAO>KLAX</ICAO>
+        <longitude>33.94250107</longitude>
+        <latitude>-118.4079971</latitude>
+        <altitude>125</altitude>
+        <timeZone>-8</timeZone>
+        <DST>A</DST>
+        <timeZone>America/Los_Angeles</timeZone>
+      </destination>
+      <planeType>Boeing 777</planeType>
+      <price>300</price>
+      <origination>MUA</origination>
+      <departureDate>2016-01-20T00:00:00</departureDate>
+      <airlineName>american</airlineName>
+    </flight>
+  </reservation>
+  <reservation>
+    <firstName>Ravindra</firstName>
+    <lastName>Jadeja</lastName>
+    <pnr>JJYRTW</pnr>
+    <passengerPhoneNumber>+91 288 2557292</passengerPhoneNumber>
+    <homeCountry>India</homeCountry>
+    <flight code="ER0945">
+      <airlineName>United</airlineName>
+      <availableSeats>0</availableSeats>
+      <departureDate>2015/06/11</departureDate>
+      <destination>
+        <airportCode>LAX</airportCode>
+        <airportName>Los Angeles International Airport</airportName>
+        <city>Los Angeles</city>
+        <country>United States</country>
+        <IATA>LAX</IATA>
+        <ICAO>KLAX</ICAO>
+        <longitude>33.94250107</longitude>
+        <latitude>-118.4079971</latitude>
+        <altitude>125</altitude>
+        <timeZone>-8</timeZone>
+        <DST>A</DST>
+        <timeZone>America/Los_Angeles</timeZone>
+      </destination>
+      <origination>MUA</origination>
+      <planeType>Boeing 707</planeType>
+      <price>423</price>
+    </flight>
+  </reservation>
+  <reservation>
+    <firstName>Kiruba</firstName>
+    <lastName>Munusamy</lastName>
+    <pnr>DL1YAA</pnr>
+    <passengerPhoneNumber>+91 11 2338 8922</passengerPhoneNumber>
+    <homeCountry>India</homeCountry>
+    <flight code="A134DS">
+      <airlineName>Delta</airlineName>
+      <availableSeats>40</availableSeats>
+      <departureDate>Apr 11, 2018</departureDate>
+      <destination>
+        <airportCode>LAX</airportCode>
+        <airportName>Los Angeles International Airport</airportName>
+        <city>Los Angeles</city>
+        <country>United States</country>
+        <IATA>LAX</IATA>
+        <ICAO>KLAX</ICAO>
+        <longitude>33.94250107</longitude>
+        <latitude>-118.4079971</latitude>
+        <altitude>125</altitude>
+        <timeZone>-8</timeZone>
+        <DST>A</DST>
+        <timeZone>America/Los_Angeles</timeZone>
+      </destination>
+      <origination>MUA</origination>
+      <planeType>BOEING 777</planeType>
+      <price>750.00</price>
+    </flight>
+  </reservation>
+</reservations>

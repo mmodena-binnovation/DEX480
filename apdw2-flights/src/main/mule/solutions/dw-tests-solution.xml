@@ -1,0 +1,2306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="wt1-2-solution" doc:id="75ae597b-2501-4217-9783-b3e9cee85028">
+		<ee:transform doc:name="Selectors" doc:id="060f7dd3-9375-4db8-a7b1-e026abdef8b7">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+
+//output application/xml writeDeclaredNamespaces="All"
+ns ap http://airports.com
+ns fl http://flights.com
+
+var flightsPayload = 
+readUrl("http://apdw.cloudhub.io/getData?file=examples/joinedFlightsAndAirportsNS.xml"
+,
+"application/xml")
+
+//var flightsPayload = payload
+
+---
+selectors: {
+    firstRoot: flightsPayload.flights,
+    
+    //allRoot: flightsPayload.*flights,
+    
+    //notDescending: flightsPayload.*flight,
+    
+    //allDescendants: flightsPayload..,
+    
+    //sizeOfAllDescendants: sizeOf(flightsPayload..)
+    
+    //firstOfAllDescendants: (flightsPayload..)[0]
+    
+    //compareExpressionsWithError: flightsPayload..[0] -- flightsPayload.flights
+    
+    //compareExpressions: flightsPayload[0] -- flightsPayload.flights
+    
+    //valuesOf: valuesOf(flightsPayload)
+    
+    //compareEquivalentExpressionsWithError: valuesOf(flightsPayload) -- flightsPayload.*flights
+    
+	//compareEquivalentExressions: valuesOf(flightsPayload)..*flight   --  flightsPayload..*flight  
+
+	//removeNotEqualObjects: valuesOf(flightsPayload).*flight   -- (flightsPayload..*flight map ( $ ++ one: "ONE"))
+
+	//namesOf: ( namesOf(flightsPayload)[0] ) : valuesOf(flightsPayload)
+
+	//keysOf: ( keysOf(flightsPayload)[0] ) : valuesOf(flightsPayload)
+
+}
+
+//flightsPayload
+
+// ( upper(entriesOf(flightsPayload).key[0] as String) ) 
+// @( (entriesOf(flightsPayload)[0].attributes ++ region: "NA"  ) )
+// : entriesOf(flightsPayload).value[0]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="dw-testsFlow-solution" doc:id="1c5a49bc-fa56-40fd-9ef4-99592b65ae06">
+		<http:listener doc:name="Listener" doc:id="1b428ede-ff7f-45d4-9b33-ca8cf3dd4557" path="/dw-tests-solution" config-ref="HTTP_Listener_config" />
+		<parse-template doc:name="index.html" doc:id="d014c2d1-5955-4d56-a3a9-77323f76b513" location="html/index.html" />
+	</flow>
+	<flow name="dwSelectors-solution" doc:id="eef4cef8-3cd0-46f8-9463-b21887e03525" >
+		<ee:transform doc:name="Transform Message" doc:id="ca60516f-3ac6-4ffc-add2-f8b244cb350e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+
+//output application/xml writeDeclaredNamespaces="All"
+
+//output application/dw
+
+output application/json
+
+//output application/csv
+
+ns ap http://airports.com
+ns fl http://flights.com
+var flightsPayload = 
+readUrl("classpath://examples//joinedFlightsAndAirportsNS.xml",
+"application/xml")
+---
+flightsPayload
+
+//flightsPayload.*flights
+
+//sizeOf(flightsPayload.flights)
+
+//sizeOf(flightsPayload.*flights)
+
+//flightsPayload..[0] -- flightsPayload.flights
+
+//flightsPayload."$(keysOf(flightsPayload)[0] as String)"
+
+//valuesOf(flightsPayload) - flightsPayload.*flights
+
+//valuesOf(flightsPayload)..*flight   -- flightsPayload..*flight 
+
+//valuesOf(flightsPayload)..*flight   -- (flightsPayload..*flight map ( $ ++ one: "ONE"))
+
+// {
+//  ( namesOf(flightsPayload)[0] ) : valuesOf(flightsPayload) 
+// } 
+
+
+
+// {
+//     ( keysOf( flightsPayload )[0] ) : valuesOf(flightsPayload)
+
+// } 
+
+
+// {
+//  ( entriesOf(flightsPayload).key[0] ) 
+//  : entriesOf(flightsPayload).value
+// } 
+
+// {
+//  ( upper( entriesOf(flightsPayload).key[0] ) ) : entriesOf(flightsPayload).value
+// } 
+
+// {
+//  ( upper( entriesOf(flightsPayload).key[0] ) ) 
+//  @(    
+//      ( entriesOf( flightsPayload )[0].attributes )
+//  )
+//  : entriesOf(flightsPayload).value  //++ [ ( entriesOf( flightsPayload )[0].attributes )]
+// } 
+
+
+// ( upper(entriesOf(flightsPayload).key[0] as String) ) 
+// @( (entriesOf(flightsPayload)[0].attributes ++ region: "NA"  ) )
+// : entriesOf(flightsPayload).value
+
+
+// ( upper(entriesOf(flightsPayload).key[0] as String) ) 
+// @( (entriesOf(flightsPayload)[0].attributes ++ region: "NA"  ) )
+// : typeOf(entriesOf(flightsPayload).value)
+
+
+// ( upper(entriesOf(flightsPayload).key[0] as String) ) 
+// @( (entriesOf(flightsPayload)[0].attributes ++ region: "NA"  ) )
+// : entriesOf(flightsPayload).value[0]
+
+
+//flightsPayload..destination?
+
+//flightsPayload..*destination! --  [null]
+
+//flightsPayload..*flight.destination!
+
+//flightsPayload..*fl#destination
+
+//flightsPayload..*flight.*destination!
+
+//flightsPayload..*flightNO.*destination!
+
+
+
+//(flightsPayload..*flightNO!).*destination!
+
+
+//(flightsPayload..*flight!).*destination!
+
+
+//( ( flightsPayload..*flight! ) .*destination! ) .@
+
+//flightsPayload..*flight.&destination
+
+//flightsPayload..*fl#flight.&destination
+
+//flightsPayload..*fl#flight.&fl#destination map $
+
+//flightsPayload..*flight.&destination map keysOf($)[0].#
+
+//flightsPayload..*flight.&destination map typeOf( keysOf($)[0].# )
+
+//flightsPayload..*flight.&destination map  keysOf($)[0].#  as Object
+
+//flightsPayload..*flight.&destination map  keysOf($)[0].#.prefix]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="dwInflix-solution" doc:id="bf13f942-75ed-4488-9acd-10eec968a2b4">
+		<ee:transform doc:name="Transform Message" doc:id="1b4a016a-af99-4874-88bb-e3a0ce61d890">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+
+output application/json
+
+var data = 
+readUrl("classpath://examples/joinedFlightsAndAirports.xml", 
+"application/xml")
+---
+(data..*flight  
+//distinctBy $."airline-name"
+filter ( ( $."available-seats" as Number > 0 ) and ( $.price as Number < 600 ) )
+//orderBy -$.price orderBy $."airline-name"
+//orderBy $."airline-name" orderBy -$.price
+orderBy ( $."airline-name" ++ (10000 - $.price ) )
+groupBy upper($."airline-name")
+).."departure-date"[0]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="addAndConcat-solution" >
+		<ee:transform doc:name="Simple add and remove arrays and objects" doc:id="e3dfa21d-5cad-46dc-823b-b9f6d4f62995" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+
+var array1 = [1, "a", true]
+
+var object1 = {one: "one1", two: "two2"}
+
+
+---
+
+{
+	addArrays: array1 + array1,
+	concatArrays: array1 ++ array1, 
+	addArrayAndObject: array1 + object1,
+	addObjectAndArrayError: "error",//object1 + array1,
+	concatArrayAndObjectError: "error", //array1 ++ object1,
+	addObjectsError: "error", //object1 + object1,
+	concatObjectAndArrayError: "error", //object1 ++ array1,
+	concatObjects: object1 ++ object1,
+	removeKey: object1 ++ object1 - "one",
+	removeEvalParens1: object1 ++ (object1 - "one"),
+	removeEvalParens2: (object1 ++ object1) - "one",
+	removeMinusMinusError: "error", //(object1 ++ object1) -- "one",
+	removeKeyValue: (object1 ++ object1) -- one:"one1",
+	removeKeyBadValue: (object1 ++ object1) -- one:"two2",
+	removeObject: (object1 ++ object1) -- object1,
+	
+}
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="WT 4-1" doc:id="2aa36b94-afb2-4e25-91e7-4023eed0efd5">
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+
+
+//Mortgage payments
+var paymentsArr = [1000, 2000, 1000, 3000]
+
+//Mortgage holder's name
+var customerObj = {
+    firstName: "Maw Shein",
+    lastName: "Win"
+}
+
+//Mortgage holder's property address
+var addressObj = {
+    street: "Elm st.",
+    number: 42,
+    city: "Oakland",
+    state: "CA"
+}
+
+---
+{
+	addArrays: paymentsArr + paymentsArr,
+	concatArrays: paymentsArr ++ paymentsArr, 
+	addArrayAndObject: paymentsArr + customerObj,
+	addObjectAndArrayError: "error", // customerObj + paymentsArr,
+	concatArrayAndObjectError: "error", //paymentsArr ++ customerObj,
+	addObjectsError:  "error", //customerObj + addressObj,
+	concatObjectAndArrayError: "error", //customerObj ++ paymentsArr,
+	concatObjects: customerObj ++ addressObj,
+	concatAndNestObjects: customerObj ++ address:addressObj,
+	AddKeyValue: customerObj ++ address:addressObj ++ country:"US",
+	AddKeyValue2: customerObj ++ address:(addressObj ++ country:"US"),
+	removeKey:  customerObj ++ address:(addressObj ++ country:"US")  - "address",
+	removeEvalParens1: customerObj ++ ( address:(addressObj ++ country:"US")  - "address" ),
+	removeEvalParens2: ( customerObj ++ address:(addressObj ++ country:"US") )  - "address",
+	removeMinusMinusError: "error", //(customerObj ++ customerObj) -- "one",
+	removeKeyValue: ( customerObj ++ address:(addressObj ++ country:"US") )  - "address" -- "firstName":"Maw Shein",
+	removeKeyBadValue: (customerObj ++ customerObj) -- one:"two2",
+	removeObject:  (( customerObj ++ address:(addressObj ++ country:"US") )  - "address" -- "firstName":"Maw Shein") -- customerObj,
+}
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="constructObjects-solution" doc:id="d701ece6-8415-4064-aa11-e3304ecbdd39">
+		<ee:transform doc:name="Construct a simple Object with { }" doc:id="ffe17c6a-4f64-406e-840a-5e88765c0a04">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+
+var array1 = [1, "a", true]
+
+var object1 = {
+	one: "one1",
+	two: "two2"
+}
+
+var array2  = [
+	objOne: object1,
+	objTwo: object1
+]
+
+import dw::core::Objects
+---
+object1]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Construct an Object with { }" doc:id="de7df046-f46c-4aa1-acd3-57e4317d25cd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+
+//Mortgage payments
+var paymentsArr = [1000, 2000, 1000, 3000]
+
+//Mortgage holder's name
+var customerObj = {
+    firstName: "Maw Shein",
+    lastName: "Win"
+}
+
+//Mortgage holder's property address
+var addressObj = {
+    street: "Elm st.",
+    number: 42,
+    city: "Oakland",
+    state: "CA"
+}
+
+var array2 = [customerObj, addressObj]
+
+var array3 = [customerObj, address:addressObj]
+
+import dw::core::Objects
+---
+
+//{ customerObj }
+
+//{( customerObj )}
+
+//{( customerObj), phone: "415-555-1234" }
+
+//array2
+
+//{ ( array2 ) }
+
+//{ ( array2 ), "phone":"415-555-1234" }
+
+//array3
+
+{( array3 )}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="matchOperatorTest-solution" doc:id="bd9e2b8e-5637-40a9-869d-91d6eb33acba" >
+		<ee:transform doc:name="Transform Message" doc:id="7b9b9a41-7682-42c7-b5c6-a2a291a395ec" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+type Flight = {ID: Number, code:String, plane: {"type": String, totalSeats: Number}}
+type FlightArray = Array<Flight>
+
+var americanFlights : FlightArray =
+[
+  {
+    "ID": 5,
+    "code": "rree1093",
+    "price": 142,
+    "departureDate": "2018-02-11T00:00:00",
+    "origin": "MUA",
+    "destination": "SFO",
+    "emptySeats": 1,
+    "plane": {
+      "type": "Boeing 737",
+      "totalSeats": 150
+    }
+  },
+  {
+    "ID": 7,
+    "code": "eefd1994",
+    "price": 676,
+    "departureDate": "2018-01-01T00:00:00",
+    "origin": "MUA",
+    "destination": "SFO",
+    "emptySeats": 0,
+    "plane": {
+      "type": "Boeing 777",
+      "totalSeats": 300
+    }
+  },
+  {
+    "ID": 8,
+    "code": "ffee2000",
+    "price": 300,
+    "departureDate": "2018-02-20T00:00:00",
+    "origin": "MUA",
+    "destination": "SFO",
+    "emptySeats": 30,
+    "plane": {
+      "type": "Boeing 737",
+      "totalSeats": 150
+    }
+  },
+  {
+    "ID": 9,
+    "code": "eefd3000",
+    "price": 900,
+    "departureDate": "2018-02-01T00:00:00",
+    "origin": "MUA",
+    "destination": "SFO",
+    "emptySeats": 0,
+    "plane": {
+      "type": "Boeing 737",
+      "totalSeats": 150
+    }
+  }
+  ]
+  
+fun processByType1( anInput ) =
+anInput 
+
+
+
+fun processByType( anInput ) =
+anInput match {
+    case is Array -> "input is an Array of size $(sizeOf(anInput))"
+    case is Object -> (inputType: "Object") ++ anInput
+    //case "SFO" -> "San Francisco"
+    case is Number -> $ as String {format: "#,###.00"} as Number
+    else -> "input " ++ anInput as String ++ " is of type " ++ typeOf( anInput )
+}
+  
+---
+processByType(americanFlights[0].ID)
+
+
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="tryAndFailTest-solution" doc:id="4bffe714-c3f0-423a-87ff-cd49f467e4cc">
+		<http:listener doc:name="HTTP:8081 /load-solution" doc:id="3dfca47b-91d5-4f4b-b0fa-1a56d250aa65" path="load-solution" config-ref="HTTP_Listener_config"/>
+		<set-variable value='#[lower(trim(attributes.queryParams.format)) default "json"]' doc:name="Set format for output" doc:id="027b94af-467f-408f-85c6-efba4e077aa9" variableName="format"/>
+		<choice doc:name="Choice" doc:id="082de108-7ea0-4115-a234-e3287b995f07" >
+			<when expression='#[vars.format contains "xml"]'>
+				<ee:transform doc:name="Try to read file path from local classpath and output as XML" doc:id="929612dd-f0e1-4efb-914c-0da9adf69ab2">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+
+import * from dw::Runtime
+
+/*
+ * Rename one of the readInput#() functions to readInput() to see various implementations 
+ * at different steps of the Walkthrough. 
+ * 
+ * readInput8() - readInput10() demonstrate custom Error types which give behavior similar to 
+ * Java try-catch exception handling, where errors are filtered by the kind of error that occurred.
+ * 
+ * readInput11() - readInput12() break up the steps in a try > orElseTry > orElse chain into separate variables,
+ * so you can quickly switch between the steps and see the success vs. error results. These flows reinforce the 
+ * logic flowchart slide. 
+ * 
+ */
+
+
+type Error<Kind <: String > = 
+{ success: false, error: { kind: Kind, message: String, stack: Array} }
+ 
+type TryError<ErrorType <: String > = 
+{ success: false, error: { kind: ErrorType, message: String, stack: Array} }
+ 
+
+
+fun readInput(anInputFile) =
+try (
+    () -> readUrl( "classpath:///$(anInputFile)" )
+)
+//Try again in an examples sub-folder of the classpath
+orElseTry (
+    log("Reading " ++ anInputFile ++ " from 'examples' subdirectory",     
+        readUrl( "classpath:///examples/$(anInputFile)")  
+    )
+)
+//Try again by reading the file as XML not DW format
+orElseTry (
+    log("Trying to read file " ++ anInputFile ++ " in XML format",     
+        readUrl( "classpath:///$(anInputFile)" , "application/xml")  
+    )
+)
+orElseTry (
+    log("Trying to read file examples/" ++ anInputFile ++ " in XML format",     
+        readUrl( "classpath:///examples/$(anInputFile)" , "application/xml")  
+    )
+)
+orElse (
+	fail( "can't read the file $( anInputFile ) in XML format" ) 
+)
+
+fun readInput1(anInputFile) =
+try (
+    () -> readUrl( "classpath:///" ++ anInputFile, "application/xml" )
+)
+orElseTry (
+    log("reading " ++ anInputFile ++ " from 'examples' subdirectory",     
+        readUrl( "classpath:///examples/" ++ anInputFile, "application/xml" )  
+    )
+)
+orElse (
+	fail( "can't read the file $( anInputFile ) as XML" ) 
+)
+
+
+
+fun readInput1b(anInputFile) =
+try (
+    () -> readUrl( "classpath:///" ++ anInputFile )
+)
+orElseTry (
+    log("Reading " ++ anInputFile ++ " from 'examples' subdirectory",     
+        readUrl( "classpath:///examples/" ++ anInputFile )  
+    )
+)
+orElseTry (
+    log("Trying to read file " ++ anInputFile ++ " in XML format",     
+        readUrl( "classpath:///" ++ anInputFile , "application/xml")  
+    )
+)
+orElse (
+	fail( "can't read the file " ++ anInputFile ) 
+)
+
+fun readInput2(anInputFile) =
+try (
+    () -> readUrl( "classpath:///" ++ anInputFile )
+)
+orElseTry (
+    log("reading " ++ anInputFile ++ " from 'examples' subdirectory",     
+        readUrl( "classpath:///examples/" ++ anInputFile )  
+    )
+)
+match{
+	else -> $ orElse (
+	    fail( "can't read the file " ++ anInputFile ++ "\n\n Stacktrace: " ++ (write($.error, "application/json") as String) ) 
+    )
+}
+
+
+
+
+fun readInput3(anInputFile) =
+try (
+    () -> readUrl( "classpath:///" ++ anInputFile )
+)
+orElseTry (
+          readUrl( "classpath:///examples/" ++ anInputFile ) 
+)
+orElse (
+	fail( "can't read the file " ++ anInputFile ) 
+)
+
+fun readInput3b(anInputFile) =
+try (
+    () -> readUrl( "classpath:///" ++ anInputFile )
+)
+orElseTry (
+          readUrl( "classpath:///examples/" ++ anInputFile ) 
+)
+orElseTry (
+	 readUrl( "classpath:///examples/" ++ anInputFile , "application/xml")	
+)
+orElse (
+	fail( "can't read the file " ++ anInputFile ) 
+)
+
+
+
+fun readInput4( anInputFile) =
+try(
+ () ->
+  readUrl("classpath:///" ++ anInputFile)
+)
+match {
+    case tr if (tr.error.kind contains "InvalidLocation") -> 
+        tr orElseTry( 
+            log("reading " ++ anInputFile ++ " from 'examples' subdirectory",    
+                readUrl( "classpath:///examples/" ++ anInputFile )  )
+	     )
+        orElse( fail("can't find file in examples subfolder.\n\n" 
+            ++ write( tr.error ) ) )
+		
+    case tr if (tr.error.kind contains "ReadExec") -> 
+        tr orElseTry( 
+            log("reading " ++ anInputFile ++ 
+                " as XML", readUrl( "classpath:///" ++ anInputFile, 
+                "application/xml" 
+            )  
+        ) )
+        orElse( 
+            fail("Can't read file as XML." 
+            	++ write( tr.error, "application/json" ) )
+        )
+        
+   
+    else -> $
+}
+	
+fun readInput5( anInputFile) =
+try(
+ () ->
+  readUrl("classpath:///" ++ anInputFile)
+)
+match {
+    case tr if (tr.error.kind contains "InvalidLocation") -> 
+        tr orElseTry( 
+            log("reading " ++ anInputFile ++ " from 'examples' subdirectory",   
+                readUrl( "classpath:///examples/" ++ anInputFile )  )
+        )
+     
+        orElse( fail("can't find file in examples subfolder.\n\n" ++ write(tr.error)) )
+        
+	
+    case tr if (tr.error.kind contains "ReadExec") -> 
+        tr orElseTry( 
+	        log("reading " ++ anInputFile ++ " as XML", 
+                readUrl( "classpath:///" ++ anInputFile, "application/xml" )  
+            )
+	    )
+        orElse( 
+            fail("Can't read the file as XML in the classpath nor in the examples subfolder.\n\n"++ write(tr.error)  )
+            
+        )
+	
+    else -> $ orElse( fail("Some other error.\n\n" ++ write($.error)))
+} 
+
+
+
+
+fun readInput6( anInputFile) =
+try(
+ () ->
+  readUrl("classpath:///" ++ anInputFile)
+)
+match {
+    //case tr if (tr.error.kind contains "InvalidLocation") -> 
+    case tr is Error<"InvalidLocationException"> -> 
+        (tr as TryResult) orElseTry( 
+            log("reading " ++ anInputFile ++ " from 'examples' subdirectory",   
+                readUrl( "classpath:///examples/" ++ anInputFile )  )
+        )
+        orElse( fail("can't find file in examples subfolder.\n\n" 
+            ++ write(tr.error)) )
+    //case tr if (tr.error.kind contains "ReadExec") -> 
+    case tr is Error<"ReadExecutionException"> -> 
+         (tr as TryResult) orElseTry( 
+	        log("reading " ++ anInputFile ++ " as XML", 
+                readUrl( "classpath:///" ++ anInputFile, "application/xml" )  
+            )
+	    )
+        orElse( 
+            fail("Can't read the file as XML in the classpath nor in the examples subfolder.\n\n"++ write(tr.error)  )  
+        )
+    else -> $ orElse( fail("Some other error.\n\n" ++ write($.error) ) )
+}
+
+	
+fun readInput7( anInputFile) =
+try(
+ () ->
+  readUrl("classpath:///" ++ anInputFile)
+)
+orElseTry(
+    readUrl("classpath:///examples/" ++  anInputFile)
+)
+orElse (
+	fail( "can't read the file " ++ anInputFile ) 
+)
+
+
+
+
+//Optional steps
+fun readInput8( anInputFile) =
+try(
+ () ->
+  readUrl("classpath:///" ++ anInputFile)
+)
+orElseTry(
+	readUrl("classpath:///exampels/" ++ anInputFile )
+)
+match {
+    case tr is Error<"InvalidLocationException"> -> 
+        
+            log("reading " ++ anInputFile ++ 
+            " from 'examples' subdirectory", tr )
+       
+        
+   
+    else -> $ // fail( "Other error" ++ write($, "application/json"))
+}
+
+fun readInput9(anInput) =
+try( () -> readUrl( "classpath:///someFile.json" ) )
+orElseTry( fail("My custom error") )
+match {
+    case tr is TryError<"InvalidLocationException"> ->
+        log( "file could not be found in the classpath" )
+        
+        
+//    case tr is TryError<"UserException"> -> log("custom error) 
+
+    else ->  $ //orElse ( "Other error: " + write( $ ) )
+}
+
+
+
+
+
+
+fun readInput10(anInput) =
+try( () -> readUrl( "classpath:///someFile.json" ) )
+orElseTry( fail("My custom error") )
+match {
+    case tr is TryError<"InvalidLocationException"> ->
+        log( "ERROR - file " ++ anInput ++ " could not be found in the classpath" ++ write(tr.error, "application/json") )
+        
+    case tr is TryError<"InvalidLocationException"> ->
+        log( "ERROR - file " ++ anInput ++ " could not be found in the classpath" ++ write(tr.error, "application/json") )
+            
+    case tr is TryError<"UserException"> -> log("ERROR - Custom error: " ++ write(tr.error, "application/json") ) 
+
+    else ->  $ //orElse ( "Other error: " + write( $ ) )
+}
+
+fun readInput11(anInputFile) =
+do{
+	
+	var tryResult1 = try (
+    	() -> readUrl( "classpath:///" ++ anInputFile )
+	)
+	var tryResult2 = tryResult1 orElseTry (
+	    log("ERROR - Could not read in file " ++ anInputFile 
+	    	++ "\nLooking for the file in an examples subfolder in the classpath.\n\nPrevious error:" 
+	    	++ write(tryResult1.error, "application/json") as String
+    		,
+	        readUrl( "classpath:///examples/" ++ anInputFile )  
+	    )
+	)
+	var final = tryResult2 orElse (
+		
+		fail( "Can't read the file " ++ anInputFile
+			++ "\n\nStacktrace:\n**Error1: "++ write(tryResult1.error, "application/json")
+			++ "\n\n**Error2: " ++ write(tryResult2.error, "application/json")
+			
+		) 
+	)
+	---
+	final
+}
+
+fun readInput12( anInputFile ) =
+do{
+	var tryResult1 = try(
+		() -> readUrl("classpath:///" ++ anInputFile )
+	)
+	
+	var error1 = tryResult1.error
+	
+	var tryResult2 = tryResult1 orElseTry(
+		log("Handling error: " ++ write(error1, "application/json"),
+			readUrl("classpath:///examples/" ++ anInputFile)
+        )
+	)
+	var error2 = tryResult2.error
+	
+	var final = tryResult2 orElse fail("Could not find file: " ++ anInputFile ++ 
+	"\n\Trace: ***Error1 " ++ write( error1, "application/json") ++ "\n\n***Error2: " ++ write( error2, "application/json"))
+	---
+	//tryResult1
+	//tryResult2
+	final
+	
+}
+
+
+---
+//try(
+//	() ->
+
+	//readInput("flightsWithDetails.xml")
+	
+//	)
+//orElseTry(
+// 	readInput("examples/flightsWithDetails.json")
+//)
+
+
+//try(
+// () ->
+// readInput( attributes.queryParams.filename  default "flightsToLAX.json")
+//readInput("examples/flightsWithDetails.xml")
+//)
+//orElseTry(
+//	readInput("examples/flightsWithDetails.json")
+//)
+
+
+readInput(attributes.queryParams.filename default "flightsToLAX.json")
+]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='vars.format contains "csv"'>
+				<ee:transform doc:name="Try to read file path from local classpath and output as CSV" doc:id="255eaefe-4f11-41a7-acb9-9669f9af62c0">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+
+import * from dw::Runtime
+
+/*
+ * Rename one of the readInput#() functions to readInput() to see various implementations 
+ * at different steps of the Walkthrough. 
+ * 
+ * readInput8() - readInput10() demonstrate custom Error types which give behavior similar to 
+ * Java try-catch exception handling, where errors are filtered by the kind of error that occurred.
+ * 
+ * readInput11() - readInput12() break up the steps in a try > orElseTry > orElse chain into separate variables,
+ * so you can quickly switch between the steps and see the success vs. error results. These flows reinforce the 
+ * logic flowchart slide. 
+ * 
+ */
+
+
+type Error<Kind <: String > = 
+{ success: false, error: { kind: Kind, message: String, stack: Array} }
+ 
+type TryError<ErrorType <: String > = 
+{ success: false, error: { kind: ErrorType, message: String, stack: Array} }
+ 
+fun readInput(anInputFile) =
+try (
+    () -> readUrl( "classpath:///$(anInputFile)" )
+)
+//Try again in an examples sub-folder of the classpath
+orElseTry (
+    log("Reading " ++ anInputFile ++ " from 'examples' subdirectory",     
+        readUrl( "classpath:///examples/$(anInputFile)")  
+    )
+)
+//Try again by reading the file as XML not DW format
+orElseTry (
+    log("Trying to read file " ++ anInputFile ++ " in CSV format",     
+        readUrl( "classpath:///$(anInputFile)" , "application/csv")  
+    )
+)
+orElseTry (
+    log("Trying to read file examples/" ++ anInputFile ++ " in CSV format",     
+        readUrl( "classpath:///examples/$(anInputFile)" , "application/csv")  
+    )
+)
+orElse (
+	fail( "can't read the file $( anInputFile ) in CSV format" ) 
+)
+
+
+
+fun readInput1b(anInputFile) =
+try (
+    () -> readUrl( "classpath:///" ++ anInputFile )
+)
+orElseTry (
+    log("Reading " ++ anInputFile ++ " from 'examples' subdirectory",     
+        readUrl( "classpath:///examples/" ++ anInputFile )  
+    )
+)
+orElseTry (
+    log("Trying to read file " ++ anInputFile ++ " in XML format",     
+        readUrl( "classpath:///" ++ anInputFile , "application/xml")  
+    )
+)
+orElse (
+	fail( "can't read the file " ++ anInputFile ) 
+)
+
+fun readInput2(anInputFile) =
+try (
+    () -> readUrl( "classpath:///" ++ anInputFile )
+)
+orElseTry (
+    log("reading " ++ anInputFile ++ " from 'examples' subdirectory",     
+        readUrl( "classpath:///examples/" ++ anInputFile )  
+    )
+)
+match{
+	else -> $ orElse (
+	    fail( "can't read the file " ++ anInputFile ++ "\n\n Stacktrace: " ++ (write($.error, "application/json") as String) ) 
+    )
+}
+
+
+
+
+fun readInput3(anInputFile) =
+try (
+    () -> readUrl( "classpath:///" ++ anInputFile )
+)
+orElseTry (
+          readUrl( "classpath:///examples/" ++ anInputFile ) 
+)
+orElse (
+	fail( "can't read the file " ++ anInputFile ) 
+)
+
+fun readInput3b(anInputFile) =
+try (
+    () -> readUrl( "classpath:///" ++ anInputFile )
+)
+orElseTry (
+          readUrl( "classpath:///examples/" ++ anInputFile ) 
+)
+orElseTry (
+	 readUrl( "classpath:///examples/" ++ anInputFile , "application/xml")	
+)
+orElse (
+	fail( "can't read the file " ++ anInputFile ) 
+)
+
+
+
+fun readInput4( anInputFile) =
+try(
+ () ->
+  readUrl("classpath:///" ++ anInputFile)
+)
+match {
+    case tr if (tr.error.kind contains "InvalidLocation") -> 
+        tr orElseTry( 
+            log("reading " ++ anInputFile ++ " from 'examples' subdirectory",    
+                readUrl( "classpath:///examples/" ++ anInputFile )  )
+	     )
+        orElse( fail("can't find file in examples subfolder.\n\n" 
+            ++ write( tr.error ) ) )
+		
+    case tr if (tr.error.kind contains "ReadExec") -> 
+        tr orElseTry( 
+            log("reading " ++ anInputFile ++ 
+                " as XML", readUrl( "classpath:///" ++ anInputFile, 
+                "application/xml" 
+            )  
+        ) )
+        orElse( 
+            fail("Can't read file as XML." 
+            	++ write( tr.error, "application/json" ) )
+        )
+        
+   
+    else -> $
+}
+	
+fun readInput5( anInputFile) =
+try(
+ () ->
+  readUrl("classpath:///" ++ anInputFile)
+)
+match {
+    case tr if (tr.error.kind contains "InvalidLocation") -> 
+        tr orElseTry( 
+            log("reading " ++ anInputFile ++ " from 'examples' subdirectory",   
+                readUrl( "classpath:///examples/" ++ anInputFile )  )
+        )
+     
+        orElse( fail("can't find file in examples subfolder.\n\n" ++ write(tr.error)) )
+        
+	
+    case tr if (tr.error.kind contains "ReadExec") -> 
+        tr orElseTry( 
+	        log("reading " ++ anInputFile ++ " as XML", 
+                readUrl( "classpath:///" ++ anInputFile, "application/xml" )  
+            )
+	    )
+        orElse( 
+            fail("Can't read the file as XML in the classpath nor in the examples subfolder.\n\n"++ write(tr.error)  )
+            
+        )
+	
+    else -> $ orElse( fail("Some other error.\n\n" ++ write($.error)))
+} 
+
+
+
+
+fun readInput6( anInputFile) =
+try(
+ () ->
+  readUrl("classpath:///" ++ anInputFile)
+)
+match {
+    //case tr if (tr.error.kind contains "InvalidLocation") -> 
+    case tr is Error<"InvalidLocationException"> -> 
+        (tr as TryResult) orElseTry( 
+            log("reading " ++ anInputFile ++ " from 'examples' subdirectory",   
+                readUrl( "classpath:///examples/" ++ anInputFile )  )
+        )
+        orElse( fail("can't find file in examples subfolder.\n\n" 
+            ++ write(tr.error)) )
+    //case tr if (tr.error.kind contains "ReadExec") -> 
+    case tr is Error<"ReadExecutionException"> -> 
+         (tr as TryResult) orElseTry( 
+	        log("reading " ++ anInputFile ++ " as XML", 
+                readUrl( "classpath:///" ++ anInputFile, "application/xml" )  
+            )
+	    )
+        orElse( 
+            fail("Can't read the file as XML in the classpath nor in the examples subfolder.\n\n"++ write(tr.error)  )  
+        )
+    else -> $ orElse( fail("Some other error.\n\n" ++ write($.error) ) )
+}
+
+	
+fun readInput7( anInputFile) =
+try(
+ () ->
+  readUrl("classpath:///" ++ anInputFile)
+)
+orElseTry(
+    readUrl("classpath:///examples/" ++  anInputFile)
+)
+orElse (
+	fail( "can't read the file " ++ anInputFile ) 
+)
+
+
+
+
+
+//Optional steps
+fun readInput8( anInputFile) =
+try(
+ () ->
+  readUrl("classpath:///" ++ anInputFile)
+)
+orElseTry(
+	readUrl("classpath:///exampels/" ++ anInputFile )
+)
+match {
+    case tr is Error<"InvalidLocationException"> -> 
+        
+            log("reading " ++ anInputFile ++ 
+            " from 'examples' subdirectory", tr )
+       
+        
+   
+    else -> $ // fail( "Other error" ++ write($, "application/json"))
+}
+
+fun readInput9(anInput) =
+try( () -> readUrl( "classpath:///someFile.json" ) )
+orElseTry( fail("My custom error") )
+match {
+    case tr is TryError<"InvalidLocationException"> ->
+        log( "file could not be found in the classpath" )
+        
+        
+//    case tr is TryError<"UserException"> -> log("custom error) 
+
+    else ->  $ //orElse ( "Other error: " + write( $ ) )
+}
+
+
+
+
+
+
+fun readInput10(anInput) =
+try( () -> readUrl( "classpath:///someFile.json" ) )
+orElseTry( fail("My custom error") )
+match {
+    case tr is TryError<"InvalidLocationException"> ->
+        log( "ERROR - file " ++ anInput ++ " could not be found in the classpath" ++ write(tr.error, "application/json") )
+        
+    case tr is TryError<"InvalidLocationException"> ->
+        log( "ERROR - file " ++ anInput ++ " could not be found in the classpath" ++ write(tr.error, "application/json") )
+            
+    case tr is TryError<"UserException"> -> log("ERROR - Custom error: " ++ write(tr.error, "application/json") ) 
+
+    else ->  $ //orElse ( "Other error: " + write( $ ) )
+}
+
+fun readInput11(anInputFile) =
+do{
+	
+	var tryResult1 = try (
+    	() -> readUrl( "classpath:///" ++ anInputFile )
+	)
+	var tryResult2 = tryResult1 orElseTry (
+	    log("ERROR - Could not read in file " ++ anInputFile 
+	    	++ "\nLooking for the file in an examples subfolder in the classpath.\n\nPrevious error:" 
+	    	++ write(tryResult1.error, "application/json") as String
+    		,
+	        readUrl( "classpath:///examples/" ++ anInputFile )  
+	    )
+	)
+	var final = tryResult2 orElse (
+		
+		fail( "Can't read the file " ++ anInputFile
+			++ "\n\nStacktrace:\n**Error1: "++ write(tryResult1.error, "application/json")
+			++ "\n\n**Error2: " ++ write(tryResult2.error, "application/json")
+			
+		) 
+	)
+	---
+	final
+}
+
+fun readInput12( anInputFile ) =
+do{
+	var tryResult1 = try(
+		() -> readUrl("classpath:///" ++ anInputFile )
+	)
+	
+	var error1 = tryResult1.error
+	
+	var tryResult2 = tryResult1 orElseTry(
+		log("Handling error: " ++ write(error1, "application/json"),
+			readUrl("classpath:///examples/" ++ anInputFile)
+        )
+	)
+	var error2 = tryResult2.error
+	
+	var final = tryResult2 orElse fail("Could not find file: " ++ anInputFile ++ 
+	"\n\Trace: ***Error1 " ++ write( error1, "application/json") ++ "\n\n***Error2: " ++ write( error2, "application/json"))
+	---
+	//tryResult1
+	//tryResult2
+	final
+	
+}
+
+
+---
+//try(
+//	() ->
+
+	//readInput("flightsWithDetails.xml")
+	
+//	)
+//orElseTry(
+// 	readInput("examples/flightsWithDetails.json")
+//)
+
+
+//try(
+// () ->
+// readInput( attributes.queryParams.filename  default "flightsToLAX.json")
+//readInput("examples/flightsWithDetails.xml")
+//)
+//orElseTry(
+//	readInput("examples/flightsWithDetails.json")
+//)
+
+
+readInput(attributes.queryParams.filename default "flightsToLAX.json")
+]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Try to read file path from local classpath and output as JSON" doc:id="17b292cf-210d-4fe9-b722-36bd043a9123">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+
+import * from dw::Runtime
+
+/*
+ * Rename one of the readInput#() functions to readInput() to see various implementations 
+ * at different steps of the Walkthrough. 
+ * 
+ * readInput8() - readInput10() demonstrate custom Error types which give behavior similar to 
+ * Java try-catch exception handling, where errors are filtered by the kind of error that occurred.
+ * 
+ * readInput11() - readInput12() break up the steps in a try > orElseTry > orElse chain into separate variables,
+ * so you can quickly switch between the steps and see the success vs. error results. These flows reinforce the 
+ * logic flowchart slide. 
+ * 
+ */
+
+
+type Error<Kind <: String > = 
+{ success: false, error: { kind: Kind, message: String, stack: Array} }
+ 
+type TryError<ErrorType <: String > = 
+{ success: false, error: { kind: ErrorType, message: String, stack: Array} }
+ 
+
+fun readInput(anInputFile) =
+try (
+    () -> readUrl( "classpath:///$(anInputFile)" )
+)
+//Try again in an examples sub-folder of the classpath
+orElseTry (
+    log("Reading " ++ anInputFile ++ " from 'examples' subdirectory",     
+        readUrl( "classpath:///examples/$(anInputFile)")  
+    )
+)
+//Try again by reading the file as XML not DW format
+orElseTry (
+    log("Trying to read file " ++ anInputFile ++ " in XML format",     
+        readUrl( "classpath:///$(anInputFile)" , "application/xml")  
+    )
+)
+orElseTry (
+    log("Trying to read file examples/" ++ anInputFile ++ " in XML format",     
+        readUrl( "classpath:///examples/$(anInputFile)" , "application/xml")  
+    )
+)
+//Try again by reading the file as XML not DW format
+orElseTry (
+    log("Trying to read file " ++ anInputFile ++ " in XML format",     
+        readUrl( "classpath:///$(anInputFile)" , "application/xml")  
+    )
+)
+orElseTry (
+    log("Trying to read file examples/" ++ anInputFile ++ " in CSV format",     
+        readUrl( "classpath:///examples/$(anInputFile)" , "application/csv")  
+    )
+)
+orElse (
+	fail( "can't read the file $( anInputFile ) in JSON, XML, nor CSV format" ) 
+)
+
+
+fun readInput1(anInputFile) =
+try (
+    () -> readUrl( "classpath:///" ++ anInputFile )
+)
+orElseTry (
+    log("reading " ++ anInputFile ++ " from 'examples' subdirectory",     
+        readUrl( "classpath:///examples/" ++ anInputFile )  
+    )
+)
+orElse (
+	fail( "can't read the file " ++ anInputFile ) 
+)
+
+
+
+fun readInput1b(anInputFile) =
+try (
+    () -> readUrl( "classpath:///" ++ anInputFile )
+)
+orElseTry (
+    log("Reading " ++ anInputFile ++ " from 'examples' subdirectory",     
+        readUrl( "classpath:///examples/" ++ anInputFile )  
+    )
+)
+orElseTry (
+    log("Trying to read file " ++ anInputFile ++ " in XML format",     
+        readUrl( "classpath:///" ++ anInputFile , "application/xml")  
+    )
+)
+orElse (
+	fail( "can't read the file " ++ anInputFile ) 
+)
+
+fun readInput2(anInputFile) =
+try (
+    () -> readUrl( "classpath:///" ++ anInputFile )
+)
+orElseTry (
+    log("reading " ++ anInputFile ++ " from 'examples' subdirectory",     
+        readUrl( "classpath:///examples/" ++ anInputFile )  
+    )
+)
+match{
+	else -> $ orElse (
+	    fail( "can't read the file " ++ anInputFile ++ "\n\n Stacktrace: " ++ (write($.error, "application/json") as String) ) 
+    )
+}
+
+
+
+
+fun readInput3(anInputFile) =
+try (
+    () -> readUrl( "classpath:///" ++ anInputFile )
+)
+orElseTry (
+          readUrl( "classpath:///examples/" ++ anInputFile ) 
+)
+orElse (
+	fail( "can't read the file " ++ anInputFile ) 
+)
+
+fun readInput3b(anInputFile) =
+try (
+    () -> readUrl( "classpath:///" ++ anInputFile )
+)
+orElseTry (
+          readUrl( "classpath:///examples/" ++ anInputFile ) 
+)
+orElseTry (
+	 readUrl( "classpath:///examples/" ++ anInputFile , "application/xml")	
+)
+orElse (
+	fail( "can't read the file " ++ anInputFile ) 
+)
+
+
+
+fun readInput4( anInputFile) =
+try(
+ () ->
+  readUrl("classpath:///" ++ anInputFile)
+)
+match {
+    case tr if (tr.error.kind contains "InvalidLocation") -> 
+        tr orElseTry( 
+            log("reading " ++ anInputFile ++ " from 'examples' subdirectory",    
+                readUrl( "classpath:///examples/" ++ anInputFile )  )
+	     )
+        orElse( fail("can't find file in examples subfolder.\n\n" 
+            ++ write( tr.error ) ) )
+		
+    case tr if (tr.error.kind contains "ReadExec") -> 
+        tr orElseTry( 
+            log("reading " ++ anInputFile ++ 
+                " as XML", readUrl( "classpath:///" ++ anInputFile, 
+                "application/xml" 
+            )  
+        ) )
+        orElse( 
+            fail("Can't read file as XML." 
+            	++ write( tr.error, "application/json" ) )
+        )
+        
+   
+    else -> $
+}
+	
+fun readInput5( anInputFile) =
+try(
+ () ->
+  readUrl("classpath:///" ++ anInputFile)
+)
+match {
+    case tr if (tr.error.kind contains "InvalidLocation") -> 
+        tr orElseTry( 
+            log("reading " ++ anInputFile ++ " from 'examples' subdirectory",   
+                readUrl( "classpath:///examples/" ++ anInputFile )  )
+        )
+     
+        orElse( fail("can't find file in examples subfolder.\n\n" ++ write(tr.error)) )
+        
+	
+    case tr if (tr.error.kind contains "ReadExec") -> 
+        tr orElseTry( 
+	        log("reading " ++ anInputFile ++ " as XML", 
+                readUrl( "classpath:///" ++ anInputFile, "application/xml" )  
+            )
+	    )
+        orElse( 
+            fail("Can't read the file as XML in the classpath nor in the examples subfolder.\n\n"++ write(tr.error)  )
+            
+        )
+	
+    else -> $ orElse( fail("Some other error.\n\n" ++ write($.error)))
+} 
+
+
+
+
+fun readInput6( anInputFile) =
+try(
+ () ->
+  readUrl("classpath:///" ++ anInputFile)
+)
+match {
+    //case tr if (tr.error.kind contains "InvalidLocation") -> 
+    case tr is Error<"InvalidLocationException"> -> 
+        (tr as TryResult) orElseTry( 
+            log("reading " ++ anInputFile ++ " from 'examples' subdirectory",   
+                readUrl( "classpath:///examples/" ++ anInputFile )  )
+        )
+        orElse( fail("can't find file in examples subfolder.\n\n" 
+            ++ write(tr.error)) )
+    //case tr if (tr.error.kind contains "ReadExec") -> 
+    case tr is Error<"ReadExecutionException"> -> 
+         (tr as TryResult) orElseTry( 
+	        log("reading " ++ anInputFile ++ " as XML", 
+                readUrl( "classpath:///" ++ anInputFile, "application/xml" )  
+            )
+	    )
+        orElse( 
+            fail("Can't read the file as XML in the classpath nor in the examples subfolder.\n\n"++ write(tr.error)  )  
+        )
+    else -> $ orElse( fail("Some other error.\n\n" ++ write($.error) ) )
+}
+
+	
+fun readInput7( anInputFile) =
+try(
+ () ->
+  readUrl("classpath:///" ++ anInputFile)
+)
+orElseTry(
+    readUrl("classpath:///examples/" ++  anInputFile)
+)
+orElse (
+	fail( "can't read the file " ++ anInputFile ) 
+)
+
+
+//
+//fun readInput(anInputFile) =
+//try (
+//    () -> readUrl( "classpath:///" ++ anInputFile )
+//)
+////Try again in an examples sub-folder of the classpath
+//orElseTry (
+//    log("Reading " ++ anInputFile ++ " from 'examples' subdirectory",     
+//        readUrl( "classpath:///examples/" ++ anInputFile )  
+//    )
+//)
+////Try again by reading the file as XML not DW format
+//orElseTry (
+//    log("Trying to read file " ++ anInputFile ++ " in XML format",     
+//        readUrl( "classpath:///" ++ anInputFile , "application/xml")  
+//    )
+//)
+//orElse (
+//	fail( "can't read the file " ++ anInputFile ) 
+//)
+
+//Optional steps
+fun readInput8( anInputFile) =
+try(
+ () ->
+  readUrl("classpath:///" ++ anInputFile)
+)
+orElseTry(
+	readUrl("classpath:///exampels/" ++ anInputFile )
+)
+match {
+    case tr is Error<"InvalidLocationException"> -> 
+        
+            log("reading " ++ anInputFile ++ 
+            " from 'examples' subdirectory", tr )
+       
+        
+   
+    else -> $ // fail( "Other error" ++ write($, "application/json"))
+}
+
+fun readInput9(anInput) =
+try( () -> readUrl( "classpath:///someFile.json" ) )
+orElseTry( fail("My custom error") )
+match {
+    case tr is TryError<"InvalidLocationException"> ->
+        log( "file could not be found in the classpath" )
+        
+        
+//    case tr is TryError<"UserException"> -> log("custom error) 
+
+    else ->  $ //orElse ( "Other error: " + write( $ ) )
+}
+
+
+
+
+
+
+fun readInput10(anInput) =
+try( () -> readUrl( "classpath:///someFile.json" ) )
+orElseTry( fail("My custom error") )
+match {
+    case tr is TryError<"InvalidLocationException"> ->
+        log( "ERROR - file " ++ anInput ++ " could not be found in the classpath" ++ write(tr.error, "application/json") )
+        
+    case tr is TryError<"InvalidLocationException"> ->
+        log( "ERROR - file " ++ anInput ++ " could not be found in the classpath" ++ write(tr.error, "application/json") )
+            
+    case tr is TryError<"UserException"> -> log("ERROR - Custom error: " ++ write(tr.error, "application/json") ) 
+
+    else ->  $ //orElse ( "Other error: " + write( $ ) )
+}
+
+fun readInput11(anInputFile) =
+do{
+	
+	var tryResult1 = try (
+    	() -> readUrl( "classpath:///" ++ anInputFile )
+	)
+	var tryResult2 = tryResult1 orElseTry (
+	    log("ERROR - Could not read in file " ++ anInputFile 
+	    	++ "\nLooking for the file in an examples subfolder in the classpath.\n\nPrevious error:" 
+	    	++ write(tryResult1.error, "application/json") as String
+    		,
+	        readUrl( "classpath:///examples/" ++ anInputFile )  
+	    )
+	)
+	var final = tryResult2 orElse (
+		
+		fail( "Can't read the file " ++ anInputFile
+			++ "\n\nStacktrace:\n**Error1: "++ write(tryResult1.error, "application/json")
+			++ "\n\n**Error2: " ++ write(tryResult2.error, "application/json")
+			
+		) 
+	)
+	---
+	final
+}
+
+fun readInput12( anInputFile ) =
+do{
+	var tryResult1 = try(
+		() -> readUrl("classpath:///" ++ anInputFile )
+	)
+	
+	var error1 = tryResult1.error
+	
+	var tryResult2 = tryResult1 orElseTry(
+		log("Handling error: " ++ write(error1, "application/json"),
+			readUrl("classpath:///examples/" ++ anInputFile)
+        )
+	)
+	var error2 = tryResult2.error
+	
+	var final = tryResult2 orElse fail("Could not find file: " ++ anInputFile ++ 
+	"\n\Trace: ***Error1 " ++ write( error1, "application/json") ++ "\n\n***Error2: " ++ write( error2, "application/json"))
+	---
+	//tryResult1
+	//tryResult2
+	final
+	
+}
+
+
+---
+//try(
+//	() ->
+
+	//readInput("flightsWithDetails.xml")
+	
+//	)
+//orElseTry(
+// 	readInput("examples/flightsWithDetails.json")
+//)
+
+
+//try(
+// () ->
+// readInput( attributes.queryParams.filename  default "flightsToLAX.json")
+//readInput("examples/flightsWithDetails.xml")
+//)
+//orElseTry(
+//	readInput("examples/flightsWithDetails.json")
+//)
+
+
+readInput(attributes.queryParams.filename default "flightsToLAX.json")
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</otherwise>
+		</choice>
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="e97fc56b-f9f2-420f-9208-861bb14b5a92">
+				<set-payload value="#[output application/json --- myError: error]" doc:name="Process raised error" doc:id="0eba6414-058e-4596-b0bf-b9adaf405606" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="tryAndFailTest-URIs" doc:id="049eb286-746c-4136-99d2-568c5b502a84">
+		<http:listener doc:name="HTTP:8081 /loadUri" doc:id="434974df-9f5d-4ac8-a1ab-560a66254b71" path="loadUri-solution" config-ref="HTTP_Listener_config"/>
+		<ee:transform doc:name="Try to read URI with baseURLs" doc:id="e3f1a3bc-0167-4ef6-af07-66b217ed9912">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+
+import * from dw::Runtime
+
+/* Set a variable readInput = readInput# to switch between different implementations
+ * at different steps of the Walkthrough. 
+ *
+ * 
+ * readInput8() - readInput11() demonstrate custom Error types which give behavior similar to 
+ * Java try-catch exception handling, where errors are filtered by the kind of error that occurred.
+ * 
+ * readInput12() - readInput13() break up the steps in a try > orElseTry > orElse chain into separate variables,
+ * so you can quickly switch between the steps and see the success vs. error results. These flows reinforce the 
+ * logic flowchart slide. 
+ * 
+ */
+
+
+type Error<Kind <: String > = 
+{ success: false, error: { kind: Kind, message: String, stack: Array} }
+ 
+type TryError<ErrorType <: String > = 
+{ success: false, error: { kind: ErrorType, message: String, stack: Array} }
+ 
+
+fun readInput1(uri) =
+try (
+    () -> readUrl( "http://mu.learn.mulesoft.com/" ++ uri )
+)
+orElseTry (
+    log("Reading " ++ uri ++ " from 'http://training4-american-ws.cloudhub.io/api/' baseUrl.",     
+        readUrl( "http://training4-american-ws.cloudhub.io/api/" ++ uri )  
+    )
+)
+orElseTry (
+    log("Reading " ++ uri ++ " from the baseUrl 'http://training4-american-ws.cloudhub.io/api/'",     
+        readUrl( "http://training4-american-ws.cloudhub.io/api/" ++ uri )  
+    )
+)
+orElse (
+	fail( "can't read the uri " ++ uri ) 
+)
+
+
+
+fun readInput2(uri) =
+try (
+    () -> readUrl( "http://mu.learn.mulesoft.com/" ++ uri )
+)
+orElseTry (
+    log("Reading " ++ uri ++ " from 'http://training4-american-ws.cloudhub.io/api/' baseUrl.",     
+        readUrl( "http://training4-american-ws.cloudhub.io/api/" ++ uri )  
+    )
+)
+orElseTry (
+    log("Trying to read uri " ++ uri ++ " in XML format",     
+        readUrl( "http://mu.learn.mulesoft.com/" ++ uri , "application/xml")  
+    )
+)
+orElse (
+	fail( "can't find the URI at baseUrl http://mu.learn.mulesoft.com nor 
+http://training4-american-ws.cloudhub.io/api, 
+or the result is not valid JSON or XML" ++ uri ) 
+)
+
+fun readInput3(uri) =
+try (
+    () -> readUrl( "http://mu.learn.mulesoft.com/" ++ uri )
+)
+orElseTry (
+    log("Reading " ++ uri ++ " from 'http://training4-american-ws.cloudhub.io/api/' baseUrl.",     
+        readUrl( "http://training4-american-ws.cloudhub.io/api/" ++ uri )  
+    )
+)
+match{
+	else -> $ orElse (
+	    fail( "can't read the uri " ++ uri ++ "\n\n Stacktrace: " ++ (write($.error, "application/json") as String) ) 
+    )
+}
+
+
+
+
+fun readInput4(uri) =
+try (
+    () -> readUrl( "http://mu.learn.mulesoft.com/" ++ uri )
+)
+orElseTry (
+        readUrl( "http://training4-american-ws.cloudhub.io/api/" ++ uri )  
+)
+orElse (
+	fail( "can't read the uri " ++ uri ) 
+)
+
+fun readInput5(uri) =
+try (
+    () -> readUrl( "http://mu.learn.mulesoft.com/" ++ uri )
+)
+orElseTry (
+        readUrl( "http://training4-american-ws.cloudhub.io/api/" ++ uri )  
+)
+orElseTry (
+	 readUrl( "http://mu.learn.mulesoft.com/" ++ uri , "application/xml")	
+)
+orElse (
+	fail( "can't find the URI at baseUrl http://mu.learn.mulesoft.com nor 
+http://training4-american-ws.cloudhub.io/api, 
+or the result is not valid JSON or XML" ++ uri ) 
+)
+
+
+
+fun readInput6( uri) =
+try(
+ () ->
+  readUrl("http://mu.learn.mulesoft.com/" ++ uri)
+)
+match {
+    case tr if (tr.error.kind contains "ReadProtocol") -> 
+        tr orElseTry( 
+            log("reading " ++ uri ++ " from 'training4-american-ws.cloudhub.io/api/' baseUrl",    
+        readUrl( "http://training4-american-ws.cloudhub.io/api/" ++ uri )  
+                )
+	     )
+        orElse( fail("can't find uri in either Training services baseUrl 'http://mu.learn.mulesoft.com/' nor 'training4-american-ws.cloudhub.io/api/'.\n\n" 
+            ++ write( tr.error ) ) )
+		
+    case tr if (tr.error.kind contains "ReadExec") -> 
+        tr orElseTry( 
+            log("reading " ++ uri ++ 
+                " as XML from mu.learn.mulesoft.com", readUrl( "http://mu.learn.mulesoft.com/" ++ uri, 
+                "application/xml" 
+            )  
+        ) )
+        orElse( 
+        	
+            fail( "can't find the URI at baseUrl http://mu.learn.mulesoft.com nor 
+http://training4-american-ws.cloudhub.io/api, 
+or the result is not valid JSON or XML: " ++ uri  
+++ "\n\n" ++ write( tr.error, "application/json" ) )
+        )
+        
+   
+    else -> $
+}
+	
+fun readInput7( uri) =
+try(
+ () ->
+  readUrl("http://mu.learn.mulesoft.com/" ++ uri)
+)
+match {
+    case tr if (tr.error.kind contains "ReadProtocol") -> 
+        tr orElseTry( 
+            log("reading " ++ uri ++ " from 'mu.learn.mulesoft.com/'" ++ uri ++ "/flights  baseUrl",    
+        		readUrl( "http://mu.learn.mulesoft.com/" ++ uri ++"/flights/" )  
+	     	)
+        )
+        tr orElseTry( 
+            log("reading " ++ uri ++ " from 'training4-american-ws.cloudhub.io/api/' baseUrl",    
+        		readUrl( "http://training4-american-ws.cloudhub.io/api/" ++ uri )  
+	     	)
+        )
+     
+        orElse( fail("Can't find uri at 'http://mu.learn.mulesoft.com/' nor 'training4-american-ws.cloudhub.io/api/' baseUrls.\n\n" ++ write(tr.error)) )
+        
+	
+    case tr if (tr.error.kind contains "ReadExec") -> 
+        tr orElseTry( 
+	        log("reading " ++ uri ++ " as XML", 
+                readUrl( "http://mu.learn.mulesoft.com/" ++ uri, "application/xml" )  
+            )
+	    )
+        orElse( 
+            fail("Can't read the uri as XML at the Training services baseUrls.\n\n"++ write(tr.error)  )
+            
+        )
+	
+    else -> $ orElse( fail("Some other error.\n\n" ++ write($.error)))
+} 
+
+
+
+
+fun readInput8( uri) =
+try(
+ () ->
+  readUrl("http://mu.learn.mulesoft.com/" ++ uri)
+)
+match {
+    //case tr if (tr.error.kind contains "ReadProtocol") -> 
+    case tr is Error<"ReadProtocolException"> -> 
+        (tr as TryResult) 
+
+        orElseTry(
+        	do{
+        		//Reformat uri values such as united?destination="CLE" to become "united/flights/CLE""
+        		var split1 = uri splitBy "?"
+                var split2 = split1[1] splitBy "&" filter ( lower($) contains 'dest')
+        		var dest = (split2[0] splitBy "=")[1] default "LAX"
+
+			---
+         	log(
+         	"reading " ++ uri ++ " from baseUrl:  'http://mu.learn.mulesoft.com/" ++ split1[0] ++ "/flights/" ++ dest ++ "'."
+         	,    
+       		 readUrl( "http://mu.learn.mulesoft.com/" ++ split1[0] as String ++ "/flights/" ++ dest as String )  
+	    		)
+	    	}
+        )
+        orElseTry( 
+
+            log("reading " ++ uri ++ " from baseUrl: 'training4-american-ws.cloudhub.io/api/'.",    
+        		readUrl( "http://training4-american-ws.cloudhub.io/api/" ++ uri )  
+	     	)
+        )
+        
+       //This fail function is only called if all the previous try and orElseTry functions raise errors
+        orElse( fail("Can't find uri at 'http://mu.learn.mulesoft.com/' nor 'training4-american-ws.cloudhub.io/api/' baseUrls.\n\n" 
+            ++ write(tr.error)) )
+              
+    //case tr if (tr.error.kind contains "ReadExec") -> 
+    case tr is Error<"ReadExecutionException"> -> 
+         (tr as TryResult) orElseTry( 
+	        log("reading " ++ uri ++ " as XML", 
+                readUrl( "http://mu.learn.mulesoft.com/" ++ uri, "application/xml" )  
+            )
+	    )
+        orElse( 
+            fail("Can't read the uri as valid JSON or XML.\n\n"++ write(tr.error)  )  
+        )
+    else -> $ orElse( fail("Some other error.\n\n" ++ write($.error) ) )
+}
+
+	
+fun readInput9( uri) =
+try(
+ () ->
+  readUrl("http://mu.learn.mulesoft.com/" ++ uri)
+)
+orElseTry(
+    readUrl( "http://training4-american-ws.cloudhub.io/api/" ++ uri )  
+)
+orElse (
+	fail( "can't read the uri " ++ uri ) 
+)
+
+
+
+fun readInput10(uri) =
+try (
+    () -> readUrl( "http://mu.learn.mulesoft.com/" ++ uri )
+)
+//Try again in the training4-american-ws web service baseUrl. 
+orElseTry (
+            log("reading " ++ uri ++ " from 'training4-american-ws.cloudhub.io/api/' baseUrl",    
+        		readUrl( "http://training4-american-ws.cloudhub.io/api/" ++ uri )  
+	     	)
+)
+//Try again by reading the uri as XML not DW format
+orElseTry (
+    log("Trying to read uri " ++ uri ++ " in XML format",     
+        readUrl( "http://mu.learn.mulesoft.com/" ++ uri , "application/xml")  
+    )
+)
+orElse (
+	fail( "can't read the uri " ++ uri ) 
+)
+
+//Optional steps
+fun readInput9( uri) =
+try(
+ () ->
+  readUrl("http://mu.learn.mulesoft.com/" ++ uri)
+)
+orElseTry(
+    readUrl( "http://training4-american-ws.cloudhub.io/api/" ++ uri )  
+)
+match {
+    case tr is Error<"ReadProtocolException"> -> 
+        
+            log("reading " ++ uri ++ " from 'training4-american-ws.cloudhub.io/api/' baseUrl",    
+        		readUrl( "http://training4-american-ws.cloudhub.io/api/" ++ uri )  
+	     	)
+    else -> $ // fail( "Other error" ++ write($, "application/json"))
+}
+
+fun readInput10(uri) =
+try( () -> 
+	readUrl("http://mu.learn.mulesoft.com/" ++ uri)
+	
+)
+orElseTry( fail("My custom error") )
+match {
+    case tr is TryError<"ReadProtocolException"> ->
+        log( "The uri could not be found at the baseUri 'http://mu.learn.mulesoft.com'." )
+        
+        
+//    case tr is TryError<"UserException"> -> log("custom error) 
+
+    else ->  $ //orElse ( "Other error: " + write( $ ) )
+}
+
+
+
+
+
+//Handle errors and return a custom error message
+fun readInput11(uri) =
+try( () -> readUrl("http://mu.learn.mulesoft.com/" ++ uri) )
+orElseTry( fail("My custom error") )
+match {
+    case tr is TryError<"ReadProtocolException"> ->
+        log( "ERROR - uri " ++ uri ++ "The uri could not be found at the baseUri 'http://mu.learn.mulesoft.com'.\n\n" ++ write(tr.error, "application/json") )
+        
+    case tr is TryError<"ReadExecutionException"> ->
+        log( "ERROR - uri " ++ uri ++ "The uri could not be found at the baseUri 'http://mu.learn.mulesoft.com'.\n\n" ++ write(tr.error, "application/json") )
+            
+    case tr is TryError<"UserException"> -> log("ERROR - Custom error: " ++ write(tr.error, "application/json") ) 
+
+    else ->  $ //orElse ( "Other error: " + write( $ ) )
+}
+
+fun readInput12(uri) =
+do{
+	
+	var tryResult1 = try (
+    	() -> readUrl( "http://mu.learn.mulesoft.com/" ++ uri )
+	)
+	var tryResult2 = tryResult1 orElseTry (
+	    log("ERROR - Could not read in uri " ++ uri 
+	    	++ "\nLooking for the uri in with baseUrl 'http://training4-american-ws.cloudhub.io/api/'.\n\nPrevious error:" 
+	    	++ write(tryResult1.error, "application/json") as String
+    		,
+	        readUrl( "http://training4-american-ws.cloudhub.io/api/" ++ uri )  
+	    )
+	)
+	var final = tryResult2 orElse (
+		
+		fail( "Can't read the uri " ++ uri ++ " from either Training services baseUrl 'http://mu.learn.mulesoft.com/' nor
+'http://training4-american-ws.cloudhub.io/api/' "
+			++ "\n\nStacktrace:\n**Error1: "++ write(tryResult1.error, "application/json")
+			++ "\n\n**Error2: " ++ write(tryResult2.error, "application/json")
+			
+		) 
+	)
+	---
+	final
+}
+
+fun readInput13( uri ) =
+do{
+	var tryResult1 = try(
+		() -> readUrl("classpath://" ++ uri )
+	)
+	
+	var error1 = tryResult1.error
+	
+	var tryResult2 = tryResult1 orElseTry(
+		log("Handling error: " ++ write(error1, "application/json"),
+		    readUrl( "http://training4-american-ws.cloudhub.io/api/" ++ uri )
+        )
+	)
+	var error2 = tryResult2.error
+	
+	var final = tryResult2 orElse fail("Could not find uri: " ++ uri ++ 
+	"\n\Trace: ***Error1 " ++ write( error1, "application/json") ++ "\n\n***Error2: " ++ write( error2, "application/json"))
+	---
+	//tryResult1
+	//tryResult2
+	final
+	
+}
+
+var readInput = readInput8
+---
+//readInput("delta?wsdl")
+
+readInput( 
+	 	if( isEmpty(attributes.queryParams.uri) )  "united?destinaton=CLE" 
+	 	else attributes.queryParams.uri 
+)
+
+//try(
+//	() ->
+
+	//readInput("flightsWithDetails.xml")
+	
+//	)
+//orElseTry(
+// 	readInput("examples/flightsWithDetails.json")
+//)
+
+
+//try(
+// () ->
+// readInput( attributes.queryParams.uri  default "flightsToLAX.json")
+//readInput("examples/flightsWithDetails.xml")
+//)
+//orElseTry(
+//	readInput("examples/flightsWithDetails.json")
+//)
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="Error Continue" doc:id="42c0f7b4-a16f-4084-aeb6-7dceb90fc196">
+				<set-payload value="#[output application/json --- myError: error]" doc:name="Process raised error" doc:id="b321368b-27a0-481f-b7e2-3812edfd1f8f" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="dynamicEvaluateTest-solution" doc:id="0fa57fa0-95ca-41fa-8d9b-525da96299fb" >
+		<http:listener doc:name="Listener" doc:id="a29451a6-ffc9-4cbf-a637-709980c6af37" path="eval-solution" config-ref="HTTP_Listener_config"/>
+		<set-variable value='output application/xml --- 
+root: { message: "order " ++ attributes.queryParams.orderid ++ " has been received from " 
+	++ uName, items: payload.items
+}' doc:name="script1" doc:id="2fa373d4-ce4e-45d5-933a-5d129ee26735" variableName="script1" />
+		<set-variable value='output application/json --- root: {  message: "Order2 " ++ attributes.queryParams.orderid ++ " has been received from " ++ uName, items: payload.items}' doc:name="script2" doc:id="cf3faec4-0592-4b38-989c-6ee9067cbf6a" variableName="script2" />
+		<set-payload value='#[if( payload is Object and payload["items"]? ) 
+payload 
+else
+items: {
+	item1: "Phone Case",
+	item2: "Phone Charger"
+}]' doc:name="Set Payload" doc:id="7d02b404-1c90-44de-9ce5-5c838ebb1f54" />
+		<ee:dynamic-evaluate doc:name="Dynamic Evaluate" doc:id="b5a20416-a8ad-433b-8089-c22de8b01a7d" expression="#[output application/json 
+--- 
+/* do {
+	var choice = attributes.queryParams.script
+	---
+	if(choice == &quot;script1&quot;) vars.script1
+	else vars.script2
+}
+*/
+
+do {
+  var choice = attributes.queryParams.script default &quot;NO_SCRIPT&quot;
+  ---
+  if(choice == &quot;NO_SCRIPT&quot;) 
+    &quot;output application/json --- {result: 'NO SCRIPT ENTERED'}&quot;
+  else if(choice == &quot;script1&quot;) vars.script1
+  else if (choice == &quot;script2&quot;)  vars.script2
+  else read(choice)
+}]" >
+			<ee:parameters >#[{ uName: attributes.queryParams.username default &quot;Annie&quot; }]</ee:parameters>
+		</ee:dynamic-evaluate>
+	</flow>
+	<flow name="testArraysModule-solution" doc:id="dbce4817-18fe-41fb-aa2b-fe0d09743be3" >
+		<ee:transform doc:name="Transform Message" doc:id="08eedeb4-ecda-42ca-b142-4ea686ca05e4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var flights = readUrl("classpath://examples/americanFlightsResponse.json")
+---
+flights
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="testObjectsModule-solution" doc:id="db45487a-20e8-4ef3-88d7-0f75b1f48243" >
+		<ee:transform doc:name="Transform Message" doc:id="553dd5dc-54e6-4a48-acdb-1ee864481e88" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/dw
+
+ns myns http://mydomain.com
+
+var object1 = 
+{ 
+   users: 
+   {
+      myns#user1 @(name: "Annie", lastname: "Point"): "AP",
+      myns#user2 @(name: "Connie", lastname: "Hector"): "CH"
+   }
+}
+
+
+---
+
+//keysOf(object1.users) map ( user ) -> user.#
+
+//keysOf(object1.users) map ( user ) ->  "index$$": typeOf( user )
+
+object1
+
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="testSelectors-solution" doc:id="1b28e9b0-c194-4a8d-879c-b51855051680" >
+		<ee:transform doc:name="Transform Message" doc:id="fe3e5a8c-5cc2-4447-be5d-70586db43c61" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml  defaultNamespace="mua", writeDeclaredNamespaces="All"
+
+//output application/dw
+
+ns mua http://mua.com
+ns fl http://flights.com 
+ns ap http://airports.com
+
+
+
+var flightsPayload = 
+readUrl("classpath://examples//joinedFlightsAndAirportsNS.xml",
+"application/xml")
+
+---
+//flightsPayload
+
+//flightsPayload.flights
+
+//flightsPayload.&flights
+
+//flightsPayload.flights.#
+
+
+//flightsPayload.flights.@
+
+//flightsPayload..
+
+//sizeOf(flightsPayload..)
+
+
+//(flightsPayload..).flights
+
+//(flightsPayload..).flight
+
+//(flightsPayload..).*flight
+
+//flightsPayload..*flight
+
+//flightsPayload..*flight.@
+
+//flightsPayload..*flight[1].@
+
+//do{
+//  var deltaFlight = flightsPayload..*flight[1]
+//  ---
+//  deltaFlight.@
+//}
+ 
+//flightsPayload..*"airline-name"
+
+
+//flightsPayload..*"airline-name".#
+
+
+//flightsPayload..*"airline-name"[1].#
+
+//flightsPayload..*"airline-name"[1].#.prefix
+
+//(flightsPayload..*city)[1].#.prefix
+
+//flightsPayload mapObject (value, key) -> 
+//	key match {
+//		case "flights" -> ( "mua:" ++ key as String) @( (key.@)) : value
+//		else -> (key):value
+//	}
+
+//flights @(  @(entriesOf(flightsPayload)[0].attributes) as Object ): flightsPayload.flights
+
+
+//flightsPayload
+
+mua#flights @( (entriesOf(flightsPayload)[0].attributes) )
+: flightsPayload.flights
+
+
+
+]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="flightsFromDW" ><![CDATA[%dw 2.0
+output application/xml defaultNamespace="mua", writeDeclaredNamespaces="All"
+
+var flights = 
+do{
+ns mua http://acme.com
+ns fl http://flights.com
+ns ap http://airports.com
+
+---
+{
+  mua#flights @(company: "MUA", BU: "travel"): {
+    fl#flight @(airline: "american"): {
+      fl#"available-seats": "+40.00",
+      fl#"airline-name": "american",
+      fl#"flight-code": "AA103",
+      fl#"departure-date": "apr 11, 2018",
+      fl#"plane-type": null,
+      fl#origination: "mua",
+      fl#price: "+750.00",
+      fl#destination @(airportCode: "klax"): {
+        ap#"airport-name": "los angeles international airport",
+        ap#city: "los angeles",
+        ap#altitude: "125",
+        ap#icao: "klax",
+        ap#destination @(airportCode: "klax"): null,
+        ap#longitude: "33.94250107"
+      }
+    },
+    fl#flight @(airline: "delta"): {
+      fl#"available-seats": "+18.00",
+      fl#"airline-name": "delta",
+      fl#"flight-code": "DL34",
+      fl#"departure-date": "aug 11, 2018",
+      fl#"plane-type": "boeing 747",
+      fl#origination: "mua",
+      fl#price: "+496.00",
+      fl#destination @(airportCode: "klax"): {
+        ap#"airport-name": "los angeles international airport",
+        ap#city: "los angeles",
+        ap#altitude: "125",
+        ap#icao: "klax",
+        ap#destination @(airportCode: "klax"): null,
+        ap#longitude: "33.94250107"
+      }
+    },
+    fl#flight @(airline: "united"): {
+      fl#"available-seats": "+10.00",
+      fl#"airline-name": "united",
+      fl#"flight-code": "UA203",
+      fl#"departure-date": "feb 11, 2018",
+      fl#"plane-type": "boeing 737",
+      fl#origination: "mua",
+      fl#price: "+199.99",
+      fl#destination @(airportCode: "klax"): {
+        ap#"airport-name": "los angeles international airport",
+        ap#city: "los angeles",
+        ap#altitude: "125",
+        ap#icao: "klax",
+        ap#destination @(airportCode: "klax"): null,
+        ap#longitude: "33.94250107"
+      }
+    }
+  }
+}
+}
+---
+flights]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</flow>
+	<flow name="testReduce-solution" doc:id="3fb77cd4-2f5b-4fdd-953e-aa229ce17d7c" >
+		<ee:transform doc:name="Transform Message" doc:id="0d7aa6b9-bd61-4ea5-a3e8-0fe714555636" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+var array1 = 2 to 5
+
+var stringArray = ["one", "two", "three", "go!"]
+
+var nestedArray = [ [1], [2,3], ["hello"] ]
+
+var objArray = [
+   {one: 1},
+   {two: 2, three: 3}
+]
+
+
+fun formatString( anInputString: String, formatter: (String ) -> String ) =
+formatter( anInputString )
+
+
+
+---
+{ 
+   reduceElement: array1 reduce (element, acc) -> element,
+   reduceElement2: array1 reduce $
+   ,reduceAccumulator: array1 reduce $$
+   ,reduceAccumulator2: array1 reduce (element, acc) -> acc
+   ,sumNumbersFrom1: array1 reduce (element, acc=1) -> element + acc
+   ,initAccumulator: array1 reduce (element, acc=1) -> acc
+   ,sumNumbers: array1 reduce (element, acc) -> element + acc
+   ,sumNumbersReverse: array1 reduce (element, acc) -> acc + element 
+   ,sumNumbers2: array1 dw::core::Arrays::sumBy $
+   
+   
+   ,concatStrings: array1 reduce (element, acc) -> acc ++ element
+    ,concatStrings2: array1 reduce (element, acc) -> acc ++ "," ++ element
+   ,concatStringsReverse: array1 reduce (element, acc) -> element ++ "," ++ acc
+   ,concatStringsReverseFrom1: 
+array1 reduce (element, acc=1) -> 
+   element ++ "," ++ acc
+   ,concatStrings: stringArray reduce (element, acc) -> acc ++ "," ++ element
+   ,concatStringsReverse: 
+stringArray reduce (element, acc) -> 
+   element ++ "," ++ acc
+   ,countSmallStrings: stringArray reduce (element, acc=0) -> 
+(if(sizeOf(element) < 4) 1 else 0) + acc
+,countSmallStrings2: stringArray dw::core::Arrays::countBy(sizeOf($) < 4)
+   
+   
+  , flattenChildArrays: nestedArray reduce (element, acc=[]) -> acc ++ element
+  
+  
+  ,flattenForwards: objArray reduce (element, acc={})  -> acc ++ element
+  ,flattenForwards2: {( objArray )}
+  ,flattenBackwards: objArray reduce (element, acc={})  -> element ++ acc
+  
+  ,flattenBackwards2: {( objArray[-1 to 0] )}
+  
+  
+  
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

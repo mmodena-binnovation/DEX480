@@ -1,0 +1,6 @@
+%dw 2.0
+
+type auto_3a168865_95f3_4de7_88fc_2c23cae436cf_Input_Variables_unitedRestResponseToAllDestinations = {|
+  flights: Array<{|    code: String,     price: Number,     origin: String,     destination: String,     departureDate: String,     planeType: String,     airlineName: String,     emptySeats: Number  |}>
+|}
+

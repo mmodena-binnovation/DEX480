@@ -1,0 +1,43 @@
+%dw 2.0
+
+type auto_0de5380b_23d0_4645_a0ea_df14c56e06f9_Output_Variables_flightKPIs = {|
+  american: {|
+    sumOfPrices: Any, 
+    count: Number
+  |}, 
+  delta: {|
+    sumOfPrices: Number, 
+    count: Number
+  |}, 
+  united: {|
+    sumOfPrices: Number, 
+    count: Number
+  |}
+|} | {|
+  american: {|
+    sumOfPrices: Number, 
+    count: Number
+  |}, 
+  delta: {|
+    sumOfPrices: Any, 
+    count: Number
+  |}, 
+  united: {|
+    sumOfPrices: Number, 
+    count: Number
+  |}
+|} | {|
+  american: {|
+    sumOfPrices: Number, 
+    count: Number
+  |}, 
+  united: {|
+    sumOfPrices: Any, 
+    count: Number
+  |}, 
+  delta: {|
+    sumOfPrices: Number, 
+    count: Number
+  |}
+|}
+

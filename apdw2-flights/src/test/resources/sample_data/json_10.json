@@ -1,0 +1,8 @@
+{
+  "queryParams": {
+    "code": "SFO",
+    "simulate": "true",
+    "mock", "true",
+    "airline": "american"
+  }
+}

@@ -1,0 +1,1144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:java="http://www.mulesoft.org/schema/mule/java" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp" xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
+	<flow name="testJoinAirportDetailsToFlights-solution" doc:id="a93e7779-6cce-47e7-9d08-724fdbc20a0d" >
+		<http:listener doc:name="HTTP: /join" doc:id="6fcde5ad-7414-4018-a317-447bda267f42" config-ref="HTTP_Listener_config" path="/join-solution"/>
+		<set-payload value='#[output application/java&#10;--- &#10;readUrl( "classpath://examples/flightsToLAX.json", "application/json")  //Actual solution should read from "classpath://flightsToLAX.json"]' doc:name="Mocked flightsAllAirlines results" doc:id="5e72fe29-b88a-4c4f-a84d-7656b9a69b57" />
+		<flow-ref doc:name="joinAirportDetailsToFlights" doc:id="9f51c096-e3d1-49f5-a273-20e3397656ba" name="joinAirportDetailsToFlights-solution"/>
+	</flow>
+	<flow name="joinAirportDetailsToFlights-solution" doc:id="3a168865-95f3-4de7-88fc-2c23cae436cf">
+		<ee:transform doc:name="joinAirportDetailsAsXml" doc:id="79adcc75-3db2-465e-8438-34626f3e0f41">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+//output application/json
+
+output application/xml
+
+import * from dw::modules::ComplexData
+
+//WT 6-1 steps
+
+var keysToRemove = ["openFlightsAirportId", "type", "source"]
+
+var airportDetails = 
+readUrl("classpath://airportInfoTiny.csv","application/csv")
+groupBy $.IATA
+
+
+
+
+
+fun flightsJoinedWithAirportInfo1(payload) =
+payload.flights as Array map ( (flight) -> 
+    {( flight ++
+        {
+            airportInfo: 
+            airportDetails[flight.destination][0] 
+        } 
+    )}
+)
+
+
+fun flightsJoinedWithAirportInfo2(payload) =
+payload.flights as Array map ( (flight) -> {( flight ++
+    {
+        airportInfo: 
+        { ( airportDetails[flight.destination] ) }
+   } 
+)} )
+
+
+fun flightsJoinedWithAirportInfo3(payload) =
+payload.flights as Array map ( (flight) -> {( flight ++
+    {
+        airportInfo: 
+     // { ( airportDetails[flight.destination] ) } 
+  airportDetails[flight.destination][0]
+   }
+)} )
+
+
+fun flightsJoinedWithAirportInfo4(payload) =
+payload.flights as Array map ( (flight) -> {( flight ++
+    {
+        airportInfo: 
+     // { ( airportDetails[flight.destination] ) } 
+        airportDetails[flight.destination][0]
+        - "openFlightsAirportId" - "type" - "source"
+   } 
+)} )
+
+fun flightsJoinedWithAirportInfo5(payload) =
+payload.flights as Array map ( (flight) -> {( flight ++
+    {
+        airportInfo: 
+     // { ( airportDetails[flight.destination] ) } 
+        airportDetails[flight.destination][0]
+      --["openFlightsAirportId", "type", "source"]
+   } 
+)} )
+
+
+fun listKeys(anObject : Object) = 
+//anObject
+
+//anObject pluck $
+
+//anObject pluck ($$$): $$
+
+anObject pluck $$
+
+
+
+fun flightsJoinedWithAirportInfo(payload) =
+payload.flights map ( (flight) ->
+   flight ++
+   {
+      airportInfo:
+      airportDetails[flight.destination][0]
+      --  keysToRemove
+   } 
+)
+
+
+
+
+//WT 6-2 Steps
+
+
+fun flightsJoinedWithAirportInfoV2_1(payload) =
+payload.flights map (flight) -> 
+flight
+
+
+
+
+
+fun flightsJoinedWithAirportInfoV2_2(payload) =
+payload.flights as Array map (flight, index) ->
+"flight$(index)": 
+flight mapObject (value,key) ->
+    key match {
+     	case "destination" -> joinAirportDetails(flight)
+       else -> { (key): value }
+    }
+
+
+fun flightsJoinedWithAirportInfoV2_2(payload) =
+payload.flights map (flight) -> 
+flight mapObject ( value,key ) ->
+  { (key) : value }
+
+
+fun flightsJoinedWithAirportInfoV2_3(payload) =
+payload.flights map (flight) -> 
+  flight mapObject (value,key) ->
+    { ( upper( key ) ) : value }
+
+
+fun flightsJoinedWithAirportInfoV2_4(payload) =
+payload.flights as Array map (flight, index) -> 
+"flight$(index)": flight mapObject (value,key) ->
+    { (upper( key ) ) : value }
+
+fun flightsJoinedWithAirportInfoV2_5 (payload) =
+payload.flights as Array map  (flight, index) -> 
+"flight$(index)": flight mapObject (value,key) ->
+    key match {
+        else -> { (key): value }
+    }
+
+
+fun flightsJoinedWithAirportInfoV2(payload) =
+payload.flights as Array map (flight, index) ->
+"flight$(index)": flight mapObject (value,key) ->
+    key match {
+     	case "destination" -> joinAirportDetails(flight)
+       else -> { (key): value }
+    }
+
+
+
+
+fun joinAirportDetails1(flight)= 
+destination: flight.destination
+
+
+fun joinAirportDetails2(flight) =
+destination: 
+   (
+      {airportCode: flight.destination } 
+      ++ airportDetails[flight.destination][0]
+   )
+
+
+fun joinAirportDetails(flight) =
+destination: (
+   {airportCode: flight.destination} 
+   ++ 
+   (
+      transformDetails(
+         airportDetails[flight.destination][0], keysToRemove
+      ) 
+   )
+) 
+
+
+
+fun transformDetails1(detailsObject, keysArray) = detailsObject
+
+fun transformDetails2( detailsObject, keysArray ) =
+detailsObject mapObject ( (destValue, destKey) -> 
+  { (destKey) : destValue } 
+)
+
+fun transformDetails( detailsObject, keysArray ) =
+detailsObject mapObject ( (destValue, destKey) -> 
+    if ( keysArray contains (destKey as String) ) {}
+    else { (destKey): destValue }
+)
+
+
+fun jsonToXml( anInput, rootKey ) = 
+anInput map ( (flight) -> valuesOf(flight)[0] )
+buildXmlObject rootKey
+
+
+
+
+
+
+
+
+---
+/* 
+ * WT 6-1 steps
+ */
+ 
+//airportDetails
+
+//airportDetails["SFO"][0]
+
+//payload.flights map (flight) -> flight
+
+//payload.flights as Array map  (   (flight) ->  
+//	{( flight ++
+//	    {
+//	        airportInfo: 
+//	        airportDetails[flight.destination] 
+//	    }
+//	  
+//	)}
+//
+//)
+
+//flightsJoinedWithAirportInfo(payload)
+//listKeys( airportDetails["SFO"][0] )
+
+//flightsJoinedWithAirportInfo(payload)
+
+/* 
+ * WT 6-2 steps
+ */
+ 
+(flightsJoinedWithAirportInfoV2(payload)
+jsonToXml "flight"
+)
+
+//formatDataStructure( joinedFlightsXml )
+
+//flightsJoinedWithAirportInfoV2(payload) 
+//jsonToXml "flight" 
+
+//listKeys( airportDetails["SFO"][0] )
+
+
+
+//flightsJoinedWithAirportInfoV2(payload)
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="enrichPassengerRecords-solution" doc:id="ff02644f-8802-401b-ae5d-d2778269989e" name="enrichPassengerRecords-solution"/>
+		<logger level="INFO" doc:name="Logger" doc:id="b21c73b5-a0f1-4e3d-a256-99b58a8d6dcc" message="payload"/>
+	</flow>
+	<flow name="flattenSampleScatterGatherResults-solution"  >
+		<ee:transform doc:name="Transform Message" doc:id="d4172aad-23e2-48ec-b711-b2236e2001d8">
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+
+//output application/json
+output application/xml
+
+import dw::modules::FlightsLib
+import dw::modules::ComplexData
+
+/*This variable emulates the same payload result from the
+ * getFlightsAllAirlines flow's Flatten response arrays Transform Message component. 
+ * This is the same payload the results from the Scatter-Gather component 
+ * in Development Fundamentals course solutions, and this code here is a copy of the 
+ * DataWeave code used in the getFlightsAllAirlines flow.  
+*/
+var payload = readUrl("classpath://examples/scatterGatherResult.json")
+
+
+//flatten (payload..payload) orderBy $.price
+
+//Note: This is equivalent to the flatten operation
+/*
+(payload..payload ) reduce ( (airlineFlights, acc=[]) ->
+	// acc ++ airlineFlights
+	acc ++ airlineFlights as Array
+)
+*/
+---
+//flights: ( 
+//	flatten(payload..flights) //orderBy $.price
+//)
+
+FlightsLib::combineScatterGatherResults(payload).flights
+map  ( (flight) -> 
+	//ComplexData::shuffleObject(flight, [1,0,0])
+	//ComplexData::shuffleObject(flight, (sizeOf(flight) - 1) to 0 ) 
+	//ComplexData::shuffleObject( flight, [0,1,6,4,5,7,3,2] )
+	ComplexData::shuffleObject(flight, [0,1,6,4,5,7,3,2]) 
+)
+ComplexData::buildXmlObject("flight")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="transformAmericanJsonToJava-solution" doc:id="b51802b8-d443-441b-b0df-90325ccecda5">
+		<ee:transform doc:name="American JSON to Flight Java objects" doc:id="c563365f-1735-4d11-9716-7bc6ed43a45c">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+type Currency = String {format: "###.00"}
+type Flight = Object {class: "com.mulesoft.training.Flight"}
+var airlineName = "American Airlines"
+ns mu http://mu.com
+---
+mu#flights: payload as Array map ( payload01 , indexOfPayload01 ) -> {
+	airlineName: "american",
+	availableSeats: payload01.emptySeats,
+	departureDate: payload01.departureDate,
+	destination: payload01.destination,
+	flightCode: payload01.code,
+	origination: payload01.origin,
+	planeType: payload01.plane."type",
+	price: payload01.price
+} as Flight
+
+]]></ee:set-payload>
+			</ee:message>
+			<ee:variables />
+		</ee:transform>
+	</flow>
+	<flow name="enrichPassengerRecords-solution" doc:id="b78acfaa-fd88-4724-977d-85aadabb678f" >
+		<ee:transform doc:name="wt6-3-join" doc:id="4af1a245-38d3-448e-8120-ad3727b3ab0d">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+
+//output application/dw
+output application/xml
+
+import dw::modules::ComplexData
+
+import * from dw::core::Arrays
+
+import * from dw::core::Strings
+
+var passengerRecords1 = 
+readUrl("classpath://passengerRecords.csv", "application/csv")
+
+var passengerRecords = readUrl("classpath://passengerRecords.csv", "application/csv")
+map (flight) -> flight 
+mapObject (v,k) ->
+( camelize( underscore(k) ) ): v
+
+
+
+
+var flightsWithDetails = payload
+
+
+//var joinedPassengersAndFlights =
+//dw::core::Arrays::join(
+//	passengerRecords,
+//	flightsWithDetails..*flight default [],
+//	(pass) ->  pass."Flight Code",
+//	(flight) -> flight.flightCode
+//)
+
+
+var joinedPassengersAndFlights =
+dw::core::Arrays::join(
+	passengerRecords,
+	flightsWithDetails..*flight default [],
+	(pass) ->  pass."flightCode",
+	(flight) -> flight.flightCode
+)
+
+
+
+
+
+
+
+fun combineJoinResult(joinResult) = 
+//joinResult map (e,i) -> e.l ++ flight: e.r 
+(
+	joinResult map (e,i) -> 
+	//e.l - "Flight Code" ++ {flight @(code: e.r.flightCode):( e.r )} 
+	e.l - "flightCode" ++ {flight @(code: e.r.flightCode):( e.r )}
+) map (joinedRecord) -> (
+	joinedRecord mapObject (v,k) -> k match {
+		case "flight" -> (k): v - "flightCode"
+		else -> (k): v
+	}
+)
+
+
+fun createPassengerReservations( passengerRecords, flightsWithDetails) =
+dw::core::Arrays::join(
+	passengerRecords,
+	flightsWithDetails..*flight default [],
+	(pass) ->  pass."flightCode",
+	(flight) -> flight.flightCode
+)
+
+
+
+---
+//passengerRecords
+
+//flightsWithDetails..*flights
+
+//sizeOf(passengerRecords)
+
+//dw::core::Arrays::join(
+//    passengerRecords,
+//    flightsWithDetails.*flights,
+//    (pass) -> "23",
+//    (flight) -> "23"
+//) 
+
+//dw::core::Arrays::join(
+//	passengerRecords as Array<Object>,
+//	flightsWithDetails..*flight as Array<Object>,
+//	(pass) -> "23",
+//(flight) -> "23"
+//)
+
+
+//dw::core::Arrays::join(
+//    passengerRecords,
+//    flightsWithDetails.*flights,
+//    (pass) -> "SAME",
+//    (flight) -> "SAME"
+//) 
+
+ 
+//dw::core::Arrays::join(
+//    passengerRecords,
+//    flightsWithDetails.*flights,
+//    //(pass) -> pass."Flight Code",
+//    (pass) -> if( pass."Flight Code" == "A134DS") pass."Flight Code" else ("SAME"),
+//    (flight) -> "SAME"
+//) 
+
+//dw::core::Arrays::join(
+//    passengerRecords,
+//    flightsWithDetails.*flights,
+//    //(pass) -> pass."Flight Code",
+//    (pass) -> if( pass."Flight Code" == "A134DS") pass."Flight Code" else ("SAME"),
+//	(flight) -> "A134DS"
+//) 
+
+//(
+//	dw::core::Arrays::join(
+//    passengerRecords,
+//    flightsWithDetails.*flights,
+//    //(pass) -> pass."Flight Code",
+//    (pass) -> if( pass."Flight Code" == "A134DS") pass."Flight Code" else ("SAME"),
+//	(flight) -> flight..flightCode[0] default "NULL"
+//).r
+//
+//)
+
+//dw::core::Arrays::join(
+//    passengerRecords,
+//    flightsWithDetails..*flight,
+//    (pass) ->  pass."Flight Code",
+//    (flight) -> flight..flightCode[0] default "NULL"
+//)
+
+// dw::core::Arrays::join(
+//	passengerRecords,
+//	flightsWithDetails..*flight default [],
+//	(pass) ->  pass."Flight Code",
+//	(flight) -> flight.flightCode
+//)
+
+
+// dw::core::Arrays::leftJoin(
+//	passengerRecords,
+//	flightsWithDetails..*flight default [],
+//	(pass) ->  pass."Flight Code",
+//	(flight) -> flight.flightCode
+//)
+
+
+// dw::core::Arrays::outerJoin(
+//	passengerRecords,
+//	flightsWithDetails..*flight default [],
+//	(pass) ->  pass."Flight Code",
+//	(flight) -> flight.flightCode
+//)
+
+// dw::core::Arrays::join(
+//	passengerRecords,
+//	flightsWithDetails..*flight default [],
+//	(pass) ->  pass."Flight Code",
+//	(flight) -> flight.flightCode
+//)
+
+
+//joinedPassengersAndFlights
+
+//ComplexData::buildXmlObject(
+//combineJoinResult(joinedPassengersAndFlights)
+//, "reservation"
+//)
+
+//passengerRecords
+
+//ComplexData::buildXmlObject(
+//combineJoinResult(joinedPassengersAndFlights)
+//, "reservation"
+//)
+
+ComplexData::buildXmlObject(
+combineJoinResult( createPassengerReservations(passengerRecords, payload) )
+, "reservation"
+)
+
+
+//flightsWithDetails
+
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="updateReservations" doc:id="4f9e9c9d-d0a3-4e87-8d99-862d0d06ffb1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml inlineCloseOn="empty" //Set this output to test the end of WT 6-3
+//output application/json writeAttributes=false
+
+//import dw::modules::ComplexData
+//import camelize from dw::core::Strings
+import * from dw::core::Strings
+
+//var reservationsXml = 
+//readUrl("classpath://examples/reservations.xml", "application/xml")
+var reservationsXml = payload
+
+import * from dw::core::Strings
+
+import * from dw::util::Coercions
+
+//fun updateAmerican2( flight ) =
+//flight mapObject (v,k) ->
+//     k match {
+//        case  "airlineName" -> (k): capitalize(v) ++ " Airlines"
+//        case  "flightCode" -> (k): upper(v)
+//        case "ICAO" -> {}
+//        else -> (k) : v
+//}
+//
+
+fun updateAmerican( flight ) =
+flight mapObject (v,k) ->
+     k match {
+	case  "airlineName" -> (k): capitalize(v) ++ " Airlines"
+        case  "flightCode" -> (k): upper(v)
+        else -> (k) : v
+}
+
+var updatedReservations1 = 
+readUrl("classpath://examples/updatedReservations.xml", "application/xml")
+
+    
+var updatedReservations = 
+reservationsXml update {
+	case flight at .reservations.*reservation.*flight -> flight - "flightCode"		
+}
+update {
+	     //case dest at .reservations.*reservation.*flight.*destination -> dest
+	case long at .reservations.*reservation.*flight.destination.longitude -> 
+       long as Number as String {
+		format: "###.000"
+	} 
+    case lat at .reservations.*reservation.*flight.*destination.latitude -> 
+        lat as Number as String {
+		format: "###.000"
+	}
+}
+update {
+ case dest at .reservations.*reservation.*flight.*destination -> dest - "ICAO"
+} 
+dw::util::Values::mask "passengerPhoneNumber" with "+** (***) ***-****"
+update {
+    case flight at .reservations.*reservation.*flight ->
+        if( lower(flight.airlineName) ~= "american" ) updateAmerican(flight)
+        else flight
+}
+update {
+     case res at .reservations.*reservation -> formatKeys( res ) 
+}
+
+import * from dw::Runtime
+
+fun formatKeys( anObject ) =
+anObject mapObject (v,k,i) -> k match{
+    case "flight" -> ( camelize( underscore (k) ))
+        @( 
+            ( { code: upper(  k.@.code ) } ) //build new attributes from k.@
+        ): v - "flightCode"
+    case  "flightCode" -> {}
+    else -> ( camelize( underscore(k) ) ) 
+       @( (k.@) ) : v
+}
+
+
+/*
+ * WT 6-4 solution functions
+ */
+
+//fun formatDataStructure( anyInput ) =
+// anyInput match {
+// 	case is Array -> anyInput map formatDataStructure($)
+// 	case is Object -> anyInput mapObject (value, key ) ->  
+// 		{ (upper(key) )  @( ( key.@ ) ) : formatDataStructure(value) }
+// 	case is String -> anyInput 
+// 	case is Number -> anyInput
+// 	else -> anyInput
+// }
+
+
+fun formatDataStructure1( anyInput ) =
+anyInput match {
+ 	case is Array -> anyInput map formatDataStructure($)
+ 	case is Object -> anyInput mapObject (value, key ) ->  
+ 		{ (upper(key) ) : value }
+ 	case is String -> anyInput 
+ 	case is Number -> anyInput
+ 	else -> anyInput
+ }
+ 
+ fun formatDataStructure2( anyInput ) =
+ anyInput match {
+ 	case is Array -> anyInput map formatDataStructure($)
+ 	case is Object -> anyInput mapObject (value, key ) ->  
+ 		{ (upper(key) )  @( ( key.@ ) ) : formatDataStructure(value) }
+ 	case is String -> anyInput 
+ 	case is Number -> anyInput
+ 	else -> anyInput
+ }
+
+
+
+ fun formatDataStructure3( anyInput ) =
+ anyInput match {
+ 	case is Array -> anyInput map formatDataStructure($)
+ 	case is Object -> anyInput mapObject (value, key ) ->  
+ 		{ (upper(key) )  @( ( key.@ ) ) : formatDataStructure(value) }
+ 	case is String -> anyInput 
+ 	case is Number -> anyInput
+ 	else -> anyInput
+ }
+
+fun formatDataStructure4( anyInput ) =
+ anyInput match {
+ 	case is Array -> anyInput map formatDataStructure($)
+ 	case is Object -> anyInput mapObject (value, key ) ->  
+ 		{ (upper(key) )  @( ( key.@ ) ) : formatDataStructure(value) }
+ 	case is String -> anyInput 
+ 	case is Number -> anyInput
+ 	else -> anyInput
+ }
+
+ fun formatDataStructureV1( anyInput ) =
+ anyInput match {
+ 	case is Array -> anyInput map formatDataStructureV1($)
+ 	case is Object -> anyInput mapObject (value, key ) ->  
+ 		{ (upper(key) ) @( ( key.@ ) ) : formatDataStructureV1(value) }
+ 	case is String -> anyInput 
+ 	case is Number -> anyInput
+ 	else -> anyInput
+ }
+ 
+
+ 
+
+fun formatDataStructure5( anyInput ) =
+anyInput match {
+ 	case is Array -> anyInput map formatDataStructure($)
+ 	case is Object -> anyInput mapObject (value, key ) ->  
+ 		{ (upper(key) ) @( ( key.@ ) ) : formatDataStructure(value) }
+ 	case str is String ->  if ( isNumeric(str) ) formatDataStructure(str as Number) 
+        else lower(str)  
+
+ 	case is Number -> anyInput
+ 	else -> anyInput
+ }
+
+fun formatDataStructure6( anyInput ) =
+anyInput match {
+ 	case is Array -> anyInput map formatDataStructure($)
+ 	case is Object -> anyInput mapObject (value, key ) ->  
+ 		{ (upper(key) ) @( ( key.@ ) ) : formatDataStructure(value) }
+ 	case str is String -> if ( isNumeric(str) ) formatDataStructure(str as Number) 
+          else lower(str)  
+ 	case is Number -> anyInput as String {format: "+#,##0.00;-#"}
+ 	else -> anyInput
+ }
+
+
+fun formatDataStructure( anyInput ) =
+anyInput match {
+ 	case is Null -> ""
+ 	case is Array -> anyInput map formatDataStructure($)
+ 	case is Object -> anyInput mapObject (value, key ) ->  
+        { (formatDataStructure(key) ) @( ( key.@ ) ) : formatDataStructure(value) }
+    case aKey is Key -> camelize(underscore(trim(aKey)))
+	case str is String ->  if (isNumeric(str)) formatDataStructure(toNumber(str)) else lower(str)  
+ 	
+ 	case aNum is Number -> (
+ 		
+ 	aNum  as String {format: "+#,##0.00;-#"}
+ 	
+ 	)
+ 	else -> anyInput
+ }
+
+
+
+
+
+
+---
+/*
+ // Uncomment this code block to test the WT 6-3 solution, and comment out the rest of the body expression. 
+
+reservationsXml update {
+	case long at .reservations.*reservation.*flight.destination.longitude -> 
+       long as Number as String {
+		format: "###.000"
+	} 
+    case lat at .reservations.*reservation.*flight.*destination.latitude -> 
+        lat as Number as String {
+		format: "###.000"
+	}
+// case dest at .reservations.*reservation.*flight.*destination -> dest
+} dw::util::Values::mask "passengerPhoneNumber" with "+** (***) ***-****"
+update {
+	case dest at .reservations.*reservation.*flight.*destination -> dest - "ICAO"
+}			//Comment out these two lines  to combine the cases.
+update {  	//This will cause a colliion and the first update will be ignored
+	case flight at .reservations.*reservation.*flight ->
+	    if ( lower(flight.airlineName) ~= "american" ) updateAmerican(flight)
+	    else flight
+}
+update {
+	case res at .reservations.*reservation -> formatKeys( res )
+}
+*/
+
+//updatedReservations
+formatDataStructure(updatedReservations)
+
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="calculateKPIs-solution" doc:id="98751bca-2344-4091-b169-f2a1d5e3eeb3" name="calculateKPIs-solution"/>
+	</flow>
+	<flow name="calculateKPIs-solution" doc:id="0de5380b-23d0-4645-a0ea-df14c56e06f9">
+		<ee:transform doc:name="Calculate KPIs" doc:id="64774847-0081-4c32-ac87-8670ef0a4023">
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="flightKPIs" ><![CDATA[%dw 2.0
+output application/json
+var formattedReservations = readUrl("classpath://examples/formattedReservations.xml", "application/xml")
+var joinedFlights = formattedReservations..*flight
+fun deltaFlightsKpis1(flightsInput : Array<Object> ) = flightsInput
+//fun deltaFlightsKpis( flightsInput : Array<Object> ) = 
+//flightsInput 
+//reduce (
+//	( flight, 
+//	  acc={
+//		delta: {count: 0, sumOfPrices: 0}
+//	  } 
+//	) ->
+//	acc
+//)
+fun deltaFlightsKpis(flightsInput : Array) = 
+flightsInput reduce (( flight, 
+    acc = {
+	delta: {
+		count: 0,
+		sumOfPrices: 0
+	}
+} 
+  ) ->
+  flight.airlineName match {
+	case delta if(lower(delta) contains "del") -> 
+      delta: {
+		sumOfPrices: acc.delta.sumOfPrices + flight.price,
+		count: acc."delta".count + 1
+	}
+    else -> acc
+})
+fun allFlightsKpis(flightsInput : Array) = 
+flightsInput reduce (( flight, 
+    acc = {
+	american: {
+		count: 0,
+		sumOfPrices: 0
+	},
+	delta: {
+		count: 0,
+		sumOfPrices: 0
+	},
+	united: {
+		count: 0,
+		sumOfPrices: 0
+	},
+} 
+  ) ->
+  flight.airlineName match {
+	case amer if(lower(amer) contains "amer") -> 
+      {
+		american: {
+			sumOfPrices: acc.american.sumOfPrices  + flight.price,
+			count: acc."american".count + 1
+		},
+		delta: {
+			sumOfPrices: acc.delta.sumOfPrices default 0,
+			count: acc."delta".count default 0
+		},
+		united: {
+			sumOfPrices: acc.united.sumOfPrices default 0,
+			count: acc."united".count default 0
+		}
+	} 
+   case delta if(lower(delta) contains "del") -> 
+      {
+		american: {
+			sumOfPrices: acc.american.sumOfPrices default 0,
+			count: acc."american".count default 0
+		},
+
+		delta: {
+			sumOfPrices: acc.delta.sumOfPrices  + flight.price,
+			count: acc."delta".count + 1
+		},
+
+		united: {
+			sumOfPrices: acc.united.sumOfPrices default 0,
+			count: acc."united".count default 0
+		},
+
+	}   
+   case united if(lower(united) contains "united") -> 
+      {
+		american: {
+			sumOfPrices: acc.american.sumOfPrices,
+			count: acc."american".count
+		},
+		united: {
+			sumOfPrices: acc.united.sumOfPrices + flight.price,
+			count: acc."united".count + 1
+		},
+		delta: {
+			sumOfPrices: acc.delta.sumOfPrices,
+			count: acc."delta".count
+		},
+
+	}
+    
+    else -> acc
+}) 
+
+
+
+---
+
+allFlightsKpis( formattedReservations..*flight as Array<Object> )
+
+//deltaFlightsKpis( formattedReservations..*flight as Array<Object> )
+//
+//formattedReservations
+
+//do {
+//  var deltaStats = deltaFlightsKpis( joinedFlights as Array<Object>  )
+//  ---	
+//  deltaStats
+//}
+
+
+
+//do {
+//  var deltaStats = deltaFlightsKpis(joinedFlights)
+//  var aveDeltaPrice = (
+//    (deltaStats..sumOfPrices[0] as Number) / (deltaStats..count[0] as Number ) ) 
+//  ---	
+//  aveDeltaPrice
+//} 
+
+
+
+//do {
+//  var deltaStats = deltaFlightsKpis(joinedFlights)
+//  var aveDeltaPrice = round(
+//    	(deltaStats..sumOfPrices[0] as Number) / (deltaStats..count[0] as Number ) 
+//    ) 
+//    as String {format: "#,###"} as Number
+//  ---	
+//  aveDeltaPrice
+//} 
+
+
+//
+//do{
+//	fun calcAve( flightStats ) =
+//	round(
+//    	(flightStats..sumOfPrices[0] as Number) / (flightStats..count[0] as Number ) 
+//    ) 
+//    as String {format: "#,###"} as Number
+//	---
+//	aveFlightCost: allFlightsKpis( vars.formattedReservations..*flight as Array<Object>)   
+//	mapObject (stats, airline) -> {
+//		(airline) : calcAve( stats )
+//	}
+//}]]></ee:set-variable>
+				<ee:set-variable variableName="deltaKPIs" ><![CDATA[%dw 2.0
+output application/json
+var formattedReservations = readUrl("classpath://examples/formattedReservations.xml", "application/xml")
+var joinedFlights = formattedReservations..*flight
+fun deltaFlightsKpis1(flightsInput : Array<Object> ) = flightsInput
+//fun deltaFlightsKpis( flightsInput : Array<Object> ) = 
+//flightsInput 
+//reduce (
+//	( flight, 
+//	  acc={
+//		delta: {count: 0, sumOfPrices: 0}
+//	  } 
+//	) ->
+//	acc
+//)
+fun deltaFlightsKpis(flightsInput : Array) = 
+flightsInput reduce (( flight, 
+    acc = {
+	delta: {
+		count: 0,
+		sumOfPrices: 0
+	}
+} 
+  ) ->
+  flight.airlineName match {
+	case delta if(lower(delta) contains "del") -> 
+      delta: {
+		sumOfPrices: acc.delta.sumOfPrices + flight.price,
+		count: acc."delta".count + 1
+	}
+    else -> acc
+})
+fun allFlightsKpis(flightsInput : Array) = 
+flightsInput reduce (( flight, 
+    acc = {
+	american: {
+		count: 0,
+		sumOfPrices: 0
+	},
+	delta: {
+		count: 0,
+		sumOfPrices: 0
+	},
+	united: {
+		count: 0,
+		sumOfPrices: 0
+	},
+} 
+  ) ->
+  flight.airlineName match {
+	case amer if(lower(amer) contains "amer") -> 
+      {
+		american: {
+			sumOfPrices: acc.american.sumOfPrices  + flight.price,
+			count: acc."american".count + 1
+		},
+		delta: {
+			sumOfPrices: acc.delta.sumOfPrices default 0,
+			count: acc."delta".count default 0
+		},
+		united: {
+			sumOfPrices: acc.united.sumOfPrices default 0,
+			count: acc."united".count default 0
+		}
+	} 
+   case delta if(lower(delta) contains "del") -> 
+      {
+		american: {
+			sumOfPrices: acc.american.sumOfPrices default 0,
+			count: acc."american".count default 0
+		},
+
+		delta: {
+			sumOfPrices: acc.delta.sumOfPrices  + flight.price,
+			count: acc."delta".count + 1
+		},
+
+		united: {
+			sumOfPrices: acc.united.sumOfPrices default 0,
+			count: acc."united".count default 0
+		},
+
+	}   
+   case united if(lower(united) contains "united") -> 
+      {
+		american: {
+			sumOfPrices: acc.american.sumOfPrices,
+			count: acc."american".count
+		},
+		united: {
+			sumOfPrices: acc.united.sumOfPrices + flight.price,
+			count: acc."united".count + 1
+		},
+		delta: {
+			sumOfPrices: acc.delta.sumOfPrices,
+			count: acc."delta".count
+		},
+
+	}
+    
+    else -> acc
+}) 
+
+
+
+---
+//deltaFlightsKpis( formattedReservations..*flight as Array<Object> )
+//
+//formattedReservations
+
+//do {
+//  var deltaStats = deltaFlightsKpis( joinedFlights as Array<Object>  )
+//  ---	
+//  deltaStats
+//}
+
+
+
+//do {
+//  var deltaStats = deltaFlightsKpis(joinedFlights)
+//  var aveDeltaPrice = (
+//    (deltaStats..sumOfPrices[0] as Number) / (deltaStats..count[0] as Number ) ) 
+//  ---	
+//  aveDeltaPrice
+//} 
+
+
+
+do {
+  var deltaStats = deltaFlightsKpis(joinedFlights)
+  var aveDeltaPrice = round(
+    	(deltaStats..sumOfPrices[0] as Number) / (deltaStats..count[0] as Number ) 
+    ) 
+    as String {format: "#,###"} as Number
+  ---	
+  aveDeltaPrice
+} 
+
+
+//
+//do{
+//	fun calcAve( flightStats ) =
+//	round(
+//    	(flightStats..sumOfPrices[0] as Number) / (flightStats..count[0] as Number ) 
+//    ) 
+//    as String {format: "#,###"} as Number
+//	---
+//	aveFlightCost: allFlightsKpis( vars.formattedReservations..*flight as Array<Object>)   
+//	mapObject (stats, airline) -> {
+//		(airline) : calcAve( stats )
+//	}
+//}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Integrate KPIs with payload" doc:id="af4db6d6-d7c5-49d0-80b8-75beb0e1af14" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+
+import * from dw::core::Strings
+
+var flightKPIs = vars.flightKPIs
+
+var flightAve = flightKPIs update {
+	case am at .american -> (am.sumOfPrices/am.count)
+	case d at .delta -> (d.sumOfPrices/d.count)
+	case u at .united -> (u.sumOfPrices/u.count)
+}
+---
+
+
+//stats: do{
+//    //var stat = flightStats[dw::core::Strings::words(fl.airlineName)[0]]
+//    //Later stats values are null unless flightAve is accessed in the do statement header
+//    var aveFlightPrice = flightAve //[dw::core::Strings::words(fl.airlineName)[0]]
+//    ---
+//    //stat.sumOfPrices / stat.count
+//    flightAve[ "united" ] //words(fl.airlineName)[0] ]
+//}
+
+
+
+payload
+
+
+ update {
+	case fl at .reservations.*reservation.*flight ->
+	fl ++  aveFlightPrice: 
+			fl.airlineName match {
+				case am if(am contains "amer") -> flightAve."american" default flightKPIs.american.sumOfPrices/flightKPIs.american.count		
+				case d if(d contains "del") -> flightAve."delta" default flightKPIs.delta.sumOfPrices/flightKPIs.delta.count
+				case u if(u contains "uni") -> flightAve."united" default flightKPIs.united.sumOfPrices/flightKPIs.united.count
+				else -> "AVE FLIGHT DATA NOT AVAILABLE"
+			}
+}
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	
+	
+
+</mule>

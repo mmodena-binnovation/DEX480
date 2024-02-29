@@ -1,0 +1,14 @@
+{
+  "american": {
+    "sumOfPrices": 300.00,
+    "count": 1
+  },
+  "delta": {
+    "sumOfPrices": 1500.00,
+    "count": 2
+  },
+  "united": {
+    "sumOfPrices": 423.00,
+    "count": 1
+  }
+}

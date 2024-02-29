@@ -1,0 +1,115 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<RESERVATIONS>
+  <RESERVATION>
+    <FIRSTNAME>john</FIRSTNAME>
+    <LASTNAME>wayne </LASTNAME>
+    <PNR>er13rl</PNR>
+    <PASSENGERPHONENUMBER>+** (***) ***-****</PASSENGERPHONENUMBER>
+    <HOMECOUNTRY>usa</HOMECOUNTRY>
+    <FLIGHT code="A134DS">
+      <PRICE>+750.00</PRICE>
+      <AVAILABLESEATS>+50.00</AVAILABLESEATS>
+      <PLANETYPE/>
+      <DEPARTUREDATE>apr 11, 2018</DEPARTUREDATE>
+      <ORIGINATION>mua</ORIGINATION>
+      <AIRLINENAME>delta</AIRLINENAME>
+      <DESTINATION>
+        <AIRPORTCODE>lax</AIRPORTCODE>
+        <AIRPORTNAME>los angeles international airport</AIRPORTNAME>
+        <CITY>los angeles</CITY>
+        <COUNTRY>united states</COUNTRY>
+        <IATA>lax</IATA>
+        <LONGITUDE>33.943</LONGITUDE>
+        <LATITUDE>-118.408</LATITUDE>
+        <ALTITUDE>+125.00</ALTITUDE>
+        <TIMEZONE>-8</TIMEZONE>
+        <DST>a</DST>
+        <TIMEZONE>america/los_angeles</TIMEZONE>
+      </DESTINATION>
+    </FLIGHT>
+  </RESERVATION>
+  <RESERVATION>
+    <FIRSTNAME>andrea</FIRSTNAME>
+    <LASTNAME>schmidt</LASTNAME>
+    <PNR>byr2rt</PNR>
+    <PASSENGERPHONENUMBER>+** (***) ***-****</PASSENGERPHONENUMBER>
+    <HOMECOUNTRY>germany</HOMECOUNTRY>
+    <FLIGHT code="FFEE0192">
+      <PRICE>+300.00</PRICE>
+      <AVAILABLESEATS>+0.00</AVAILABLESEATS>
+      <PLANETYPE>boeing 777</PLANETYPE>
+      <DEPARTUREDATE>2018-01-20t00:00:00</DEPARTUREDATE>
+      <ORIGINATION>mua</ORIGINATION>
+      <AIRLINENAME>american airlines</AIRLINENAME>
+      <DESTINATION>
+        <AIRPORTCODE>lax</AIRPORTCODE>
+        <AIRPORTNAME>los angeles international airport</AIRPORTNAME>
+        <CITY>los angeles</CITY>
+        <COUNTRY>united states</COUNTRY>
+        <IATA>lax</IATA>
+        <LONGITUDE>33.943</LONGITUDE>
+        <LATITUDE>-118.408</LATITUDE>
+        <ALTITUDE>+125.00</ALTITUDE>
+        <TIMEZONE>-8</TIMEZONE>
+        <DST>a</DST>
+        <TIMEZONE>america/los_angeles</TIMEZONE>
+      </DESTINATION>
+    </FLIGHT>
+  </RESERVATION>
+  <RESERVATION>
+    <FIRSTNAME>ravindra</FIRSTNAME>
+    <LASTNAME>jadeja</LASTNAME>
+    <PNR>jjyrtw</PNR>
+    <PASSENGERPHONENUMBER>+** (***) ***-****</PASSENGERPHONENUMBER>
+    <HOMECOUNTRY>india</HOMECOUNTRY>
+    <FLIGHT code="ER0945">
+      <AIRLINENAME>united</AIRLINENAME>
+      <AVAILABLESEATS>+0.00</AVAILABLESEATS>
+      <DEPARTUREDATE>2018/06/11</DEPARTUREDATE>
+      <DESTINATION>
+        <AIRPORTCODE>lax</AIRPORTCODE>
+        <AIRPORTNAME>los angeles international airport</AIRPORTNAME>
+        <CITY>los angeles</CITY>
+        <COUNTRY>united states</COUNTRY>
+        <IATA>lax</IATA>
+        <LONGITUDE>33.943</LONGITUDE>
+        <LATITUDE>-118.408</LATITUDE>
+        <ALTITUDE>+125.00</ALTITUDE>
+        <TIMEZONE>-8</TIMEZONE>
+        <DST>a</DST>
+        <TIMEZONE>america/los_angeles</TIMEZONE>
+      </DESTINATION>
+      <ORIGINATION>mua</ORIGINATION>
+      <PLANETYPE>boeing 707</PLANETYPE>
+      <PRICE>+423.00</PRICE>
+    </FLIGHT>
+  </RESERVATION>
+  <RESERVATION>
+    <FIRSTNAME>kiruba</FIRSTNAME>
+    <LASTNAME>munusamy</LASTNAME>
+    <PNR>dl1yaa</PNR>
+    <PASSENGERPHONENUMBER>+** (***) ***-****</PASSENGERPHONENUMBER>
+    <HOMECOUNTRY>india</HOMECOUNTRY>
+    <FLIGHT code="A134DS">
+      <PRICE>+750.00</PRICE>
+      <AVAILABLESEATS>+50.00</AVAILABLESEATS>
+      <PLANETYPE>boeing 777</PLANETYPE>
+      <DEPARTUREDATE>apr 11, 2018</DEPARTUREDATE>
+      <ORIGINATION>mua</ORIGINATION>
+      <AIRLINENAME>delta</AIRLINENAME>
+      <DESTINATION>
+        <AIRPORTCODE>lax</AIRPORTCODE>
+        <AIRPORTNAME>los angeles international airport</AIRPORTNAME>
+        <CITY>los angeles</CITY>
+        <COUNTRY>united states</COUNTRY>
+        <IATA>lax</IATA>
+        <LONGITUDE>33.943</LONGITUDE>
+        <LATITUDE>-118.408</LATITUDE>
+        <ALTITUDE>+125.00</ALTITUDE>
+        <TIMEZONE>-8</TIMEZONE>
+        <DST>a</DST>
+        <TIMEZONE>america/los_angeles</TIMEZONE>
+      </DESTINATION>
+    </FLIGHT>
+  </RESERVATION>
+</RESERVATIONS>

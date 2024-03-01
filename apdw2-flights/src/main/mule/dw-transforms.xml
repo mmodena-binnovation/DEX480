@@ -31,37 +31,18 @@ payload
 ]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<logger level="INFO" doc:name="Logger" doc:id="b21c73b5-a0f1-4e3d-a256-99b58a8d6dcc" message="payload"/>
+    <logger level="INFO" doc:name="Logger" doc:id="b21c73b5-a0f1-4e3d-a256-99b58a8d6dcc" message="payload"/>
 	</flow>
 	<flow name="flattenSampleScatterGatherResults">
 		<ee:transform doc:name="Transform Message" doc:id="83bf8e0e-b943-4bca-bf23-5f089c1ff298">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
-output application/java
-
-/*This variable emulates the same payload result from the
- * getFlightsAllAirlines flow's Flatten response arrays Transform Message component. 
- * This is the same payload the results from the Scatter-Gather component 
- * in Development Fundamentals course solutions, and this code here is a copy of the 
- * DataWeave code used in the getFlightsAllAirlines flow.  
-*/
+output application/json
+import dw::modules::FlightsLib
+import dw::modules::ComplexData
 var payload = readUrl("classpath://examples/scatterGatherResult.json")
-
-
-//flatten (payload..payload) orderBy $.price
-
-//Note: This is equivalent to the flatten operation
-/*
-(payload..payload ) reduce ( (airlineFlights, acc=[]) ->
-	// acc ++ airlineFlights
-	acc ++ airlineFlights as Array
-)
-*/
 ---
-flights: ( 
-	flatten(payload..flights) //orderBy $.price
-)
-]]></ee:set-payload>
+FlightsLib::combineScatterGatherResults(payload)]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 	</flow>

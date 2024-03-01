@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+	<flow name="passFunctions" doc:id="4b52ca96-3115-4f95-8c7c-d15b5485a016" >
+		<ee:transform doc:name="Transform Message" doc:id="f554ca67-0284-456b-a6c9-0048db95fee6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="dwInﬁx" doc:id="15f2efd7-6985-4506-87e9-1042402682cc" >
+		<ee:transform doc:name="Transform Message" doc:id="2d051c33-7d4f-49e6-8791-3c16cb4b80a1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+var data = readUrl("classpath://examples/joinedFlightsAndAirports.xml", "application/xml")
+---
+typeOf(
+(data..*flight
+//distinctBy $."airline-name"
+//filter $."available-seats" as Number > 50
+//filter $."available-seats" as Number > 0 and $.price as Number <= 496
+//filter not ($."available-seats" as Number == 0 or $.price as Number > 496)
+filter not ( ( $."available-seats" as Number == 0 ) or ( $.price as Number > 496 ) ) 
+orderBy ( $."airline-name" ++ (10000 - $.price ) )
+groupBy upper($."airline-name")).."departure-date"[0]
+as Date {format:"MMM dd, yyyy",locale:"en"}
+as Date {format: "dd MMMM, yyyy",locale:"en"}
+)
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="dwSelectors" doc:id="a0d70fa2-3b08-463d-9a02-26ae4bfa00ff" >
+		<ee:transform doc:name="Transform Message" doc:id="210a1fb1-bd5b-48ca-aa33-cb20c552f58d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ap http://airports.com
+ns fl http://flights.com
+var flightsPayload = readUrl("classpath://examples//joinedFlightsAndAirportsNS.xml","application/xml")
+---
+flightsPayload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="matchOperatorTest" doc:id="bd9e2b8e-5637-40a9-869d-91d6eb33acba">
+		<ee:transform doc:name="Transform Message" doc:id="7b9b9a41-7682-42c7-b5c6-a2a291a395ec">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+
+var americanFlights =
+[
+  {
+    "ID": 5,
+    "code": "rree1093",
+    "price": 142,
+    "departureDate": "2018-02-11T00:00:00",
+    "origin": "MUA",
+    "destination": "SFO",
+    "emptySeats": 1,
+    "plane": {
+      "type": "Boeing 737",
+      "totalSeats": 150
+    }
+  },
+  {
+    "ID": 7,
+    "code": "eefd1994",
+    "price": 676,
+    "departureDate": "2018-01-01T00:00:00",
+    "origin": "MUA",
+    "destination": "SFO",
+    "emptySeats": 0,
+    "plane": {
+      "type": "Boeing 777",
+      "totalSeats": 300
+    }
+  },
+  {
+    "ID": 8,
+    "code": "ffee2000",
+    "price": 300,
+    "departureDate": "2018-02-20T00:00:00",
+    "origin": "MUA",
+    "destination": "SFO",
+    "emptySeats": 30,
+    "plane": {
+      "type": "Boeing 737",
+      "totalSeats": 150
+    }
+  },
+  {
+    "ID": 9,
+    "code": "eefd3000",
+    "price": 900,
+    "departureDate": "2018-02-01T00:00:00",
+    "origin": "MUA",
+    "destination": "SFO",
+    "emptySeats": 0,
+    "plane": {
+      "type": "Boeing 737",
+      "totalSeats": 150
+    }
+  }
+  ]
+  
+
+  
+---
+americanFlights
+
+
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="addAndConcat" doc:id="7788e1a4-3791-42a3-a5b5-364f4baf7c12" >
+		<ee:transform doc:name="WT 4-2 add and remove" doc:id="242daf56-18ab-4532-9688-32ac68811d62" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+//Mortgage payments
+var paymentsArr = [1000, 2000, 1000, 3000]
+
+//Mortgage holder's name
+var customerObj = {
+    firstName: "Maw Shein",
+    lastName: "Win"
+}
+
+//Mortgage holder's property address
+var addressObj = {
+    street: "Elm st.",
+    number: 42,
+    city: "Oakland",
+    state: "CA"
+}
+---
+{
+	addArrays: null,//paymentsArr + paymentsArr
+	concatArrays: null, //paymentsArr ++ paymentsArr
+	addArrayAndObject: null,//paymentsArr + customerObj
+	concatObjects: null, //[] + customerObj ++ addressObj
+	
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Simple add and remove" doc:id="90ab3c57-0578-4d1a-86df-76028c59ece0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+//Mortgage payments
+var array1 = [1, true, "a", "1"]
+
+var object1 = {
+    one: "ONE",
+    two: "TWO"
+}
+
+
+---
+{
+	addArrays: null,//array1 + array1
+	concatArrays: null, //array1 ++ array1 
+	addArrayAndObject: null,//array1 + object1
+	addObjectAndArrayError: null, //object1 + array1
+	concatArrayAndObjectError: null, //array1 ++ object1
+	addObjectsError: null, //object1 + object1
+	concatObjectAndArrayError: null, //object1 ++ array1
+	concatObjects: null, //object1 ++ object1
+	removeKey: null, //object1 - "one"
+	removeEvalParens1: null, //object1 - "one" - "two"
+	removeEvalParens2: null, //(object1 - "one") - "two"
+	removeMinusMinusError: null,//object1 -- "one"
+	removeKeyValue: null, //object1 -- one:"ONE"
+	removeKeyBadValue: null, //object1 -- one: "BAD"
+	removeObject: null, //object1 -- object1
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

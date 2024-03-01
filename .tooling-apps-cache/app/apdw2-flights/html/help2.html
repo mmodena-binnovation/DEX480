@@ -1,0 +1,148 @@
+<html>
+<head>
+<style>
+* {
+    font-family: arial;
+  }
+  
+body {
+  background-color: powderblue;
+}
+</style>
+ </head>
+
+<body>
+
+
+<h1> Get Sample Data to Start Walkthroughs</h1>
+Change the filename query parameter to look for other files or relative paths in the Mule application's classpath. 
+<UL>
+Module 1
+<LI> <A href="./getData?file=examples/flightsToLAX.json" target="response">examples/flightsToLAX.json</A>. </LI>
+<LI> <A href="./getData?file=examples/joinedFlightsAndAirportsNS.xml" target="response">examples/joinedFlightsAndAirportsNS.xml</A>. </LI>
+</UL>
+<UL>
+Module 2
+<LI> <A href="./getData?file=examples/scatterGatherResult.json" target="response">examples/scatterGatherResult.json</A>. </LI>
+</UL>
+<UL>
+Module 3
+<LI> <A href="./getData?file=examples/flightsWithDetails.json" target="response">examples/flightsWithDetails.json</A>. </LI>
+</UL>
+<UL>
+Module 5
+<LI> <A href="./getData?file=airportInfoTiny.csv" target="response">airportInfoTiny.csv</A>. </LI>
+<LI> <A href="./getData?file=passengerRecords.csv" target="response">passengerRecords.csv</A>. </LI>
+</UL>
+<UL>
+Module 6
+<LI> <A href="./getData?file=examples/reservations.xml" target="response">examples/reservations.xml</A>. </LI>
+<LI> <A href="./getData?file=examples/updatedReservations.xml" target="response">examples/updatedReservations.xml</A>. </LI>
+<LI> <A href="./getData?file=examples/americanFlightsResponse.json" target="response">examples/americanFlightsResponse.json</A>. </LI>
+<LI> <A href="./getData?file=examples/formattedReservations.xml" target="response">examples/formattedReservations.xml</A>. </LI>
+</UL>
+
+<UL>
+Using "with binary" in the output directive to dynamically set the output type in a single DataWeave script:
+<LI> <A href="./getBinaryData?file=examples/reservations.xml" target="response">examples/reservations.xml</A>. </LI>
+<LI> <A href="./getBinaryData?file=examples/updatedReservations.xml" target="response">examples/updatedReservations.xml</A>. </LI>
+<LI> <A href="./getBinaryData?file=examples/americanFlightsResponse.json" target="response">examples/americanFlightsResponse.json</A>. </LI>
+<LI> <A href="./getBinaryData?file=examples/formattedReservations.xml" target="response">examples/formattedReservations.xml</A>. </LI>
+<LI> <A href="./getBinaryData?file=airportInfoTiny.csv" target="response">airportInfoTiny.csv</A>. </LI>
+<LI> <A href="./getBinaryData?file=passengerRecords.csv" target="response">passengerRecords.csv</A>. </LI>
+
+</UL>
+<UL>
+Module 7
+<LI> <A href="./getData?file=examples/flightsAllAirlinesLAX.json" target="response">examples/flightsAllAirlinesLAX.json</A>. </LI>
+</UL>
+<UL>
+<P>
+<H2> Try to read from online URIs</H2>
+<LI> Try to find a /flights endpoint in the Training online services (returns American database formatted response): <A href="./loadUri-solution?uri=flights" target="response"> ./loadUri-solution?uri=flights</A>. </LI>
+<LI> Try to find a /american endpoint in the Training online services (returns American flights in a different format): <A href="./loadUri-solution?uri=american" target="response"> ./loadUri-solution?uri=american</A>. </LI>
+<LI> Try to find a /united endpoint in the Training online services: <A href="./loadUri-solution?uri=united" target="response"> ./loadUri-solution?uri=united</A>. </LI>
+<LI> Try to find a /united/flights endpoint in the Training online services: <A href="./loadUri-solution?uri=united/flights" target="response"> ./loadUri-solution?uri=united</A>. </LI>
+<LI> Try to find a /delta endpoint in the Training online services (this fails because this is a SOAP web service that must be called with a valid XML payload): <A href="./loadUri-solution?uri=delta" target="response"> ./loadUri-solution?uri=delta</A>. </LI>
+<LI> Try to find a /delta?wsdl endpoint in the Training online services (this returns the WSDL file for the online Delta SOAP web service): <A href="./loadUri-solution?uri=delta?wsdl" target="response"> ./loadUri-solution?uri=delta?wsdl</A>. </LI>
+</UL>
+
+<hr>
+<h1> Flights Search</h1>
+Submit a request to ./flights?code=<<SFO | LAX | PDX | CLE>>&airline=<<american | delta | united>>&simulate=<<true | false>>
+
+<p> Default Values are:
+<UL>
+<LI> code: SFO
+<LI> airline: american
+<LI> mock: true
+</UL>
+<P> Allowed airport codes are CLE, LAX, PDX, and SFO. All other values default to SFO. 
+<P> If simulate = true, then all three airline services are simulated locally within the Mule application. 
+This allows the Flights search to work when the computer is offline. If mock = false, then external requests are made to the three MuleSoft training web services for simulated American, Delta, and United airlines flight information. 
+<HR>
+
+<P> Here are some common links used in the course:
+
+<UL>
+
+<LI> <A href="./flights?code=SFO&airline=american" target=test>./flights?code=SFO&airline=american</A>
+<LI> <A href="./flights?code=LAX&airline=delta" target=test>./flights?code=LAX&airline=delta</A>
+<LI> <A href="./flights?code=CLE&airline=united" target=test>./flights?code=CLE&airline=united</A>
+<LI> <A href="./flights?code=LAX&airline=all" target=test>./flights?code=LAX&airline=all</A>
+<LI> <A href="./flights?code=PDX&airline=united" target=test>./flights?code=CLE&airline=united</A>
+</UL>
+
+<h3> Use real MuleSoft Training hosted web services</h3>
+<UL>
+
+<LI> <A href="./flights?code=SFO&airline=american&mock=false" target=test>./flights?code=SFO&airline=american&mock=false</A>
+<LI> <A href="./flights?code=LAX&airline=delta&mock=false" target=test>./flights?code=LAX&airline=delta&mock=false</A>
+<LI> <A href="./flights?code=CLE&airline=united&mock=false" target=test>./flights?code=CLE&airline=united&mock=false</A>
+<LI> <A href="./flights?code=LAX&airline=all" target=test>./flights?code=LAX&airline=all&mock=false</A>
+<LI> <A href="./flights?code=PDX&airline=united" target=test>./flights?code=CLE&airline=united</A>
+</UL>
+
+
+
+<h3> Use solution flows with mocked endpoints</h3>
+
+
+<UL>
+<LI> <A href="./flights?solution=true&code=LAX&airline=delta" target=test>./flights?solution=true&code=LAX&airline=delta</A>
+<LI> <A href="./flights?solution=true&code=LAX&airline=all" target=test>./flights?solution=true&code=LAX&airline=all</A>
+</UL>
+
+<h3> Use solution flows with real MuleSoft Training hosted web services</h3>
+<UL>
+<LI> <A href="./flights?solution=true&code=LAX&airline=delta&mock=false" target=test>./flights?solution=true&code=LAX&airline=delta&mock=false</A>
+<LI> <A href="./flights?solution=true&code=LAX&airline=all" target=test>./flights?solution=true&code=LAX&airline=all&mock=false</A>
+</UL>
+
+
+
+
+<hr>
+<h1> Module 3 Error Handling Examples</h1>
+Change the filename query parameter to look for other files or relative paths in the Mule application's classpath. 
+<UL>
+<LI> Try to find flightsToLAX.json in the Mule application classpath: <A href="./load-solution?filename=flightsToLAX.json" target="response"> ./load-solution?filename=flightsToLAX.json</A>. </LI>
+<LI> Try to find the non-existent file noGood.json in the Mule application classpath, which raises an error: <A href="./load-solution?filename=noGood.json" target="response"> ./load-solution?filename=nogood.json</A>. </LI>
+<LI> Try to find examples/flightsToLAX.json in the Mule application classpath: <A href="./load-solution?filename=examples/flightsToLAX.json" target="response"> ./load-solution?filename=examples/flightsToLAX.json</A>. </LI>
+<LI> Try to find flightsToLAX.xml in the Mule application classpath: <A href="./load-solution?filename=flightsToLAX.json" target="response">./load-solution?filename=flightsToLAX.json</A>. </LI>
+<LI> Try to find examples/flightsToLAX.xml in the Mule application classpath: <A href="./load-solution?filename=examples/flightsToLAX.xml" target="response"> ./load-solution?filename=examples/flightsToLAX.xml</A>. </LI>
+</UL>
+<UL>
+
+
+
+<hr>
+<H1> Test join function results </H1>
+<UL>
+<LI> Call the joinAirportDetailsToFlights flow in the dw-transforms.xml Mule config XML file using hard-coded mocked sample data in the Mule event payload <A href="./join" target=test>./join</A>.
+</UL>
+
+ 
+
+</body>
+</html>

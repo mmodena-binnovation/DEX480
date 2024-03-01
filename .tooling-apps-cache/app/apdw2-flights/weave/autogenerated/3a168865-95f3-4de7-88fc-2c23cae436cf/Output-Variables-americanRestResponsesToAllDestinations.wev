@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_3a168865_95f3_4de7_88fc_2c23cae436cf_Output_Variables_americanRestResponsesToAllDestinations = Array<{|  ID: Number,   code: String,   price: Number,   departureDate: String,   origin: String,   destination: String,   emptySeats: Number,   plane: {|    "type": String,     totalSeats: Number  |}|}>
+

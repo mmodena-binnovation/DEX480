@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<flow name="getSampleDataFilesFlow" doc:id="5bf7d2bb-1c25-4edf-b3f7-5c8c37d5241c" >
+		<http:listener doc:name="Listener" doc:id="75d4c7cd-4b62-4d2b-b57b-79e97f423846" config-ref="HTTP_Listener_config" path="getData"/>
+		<ee:transform doc:name="Set fileName and format vars from queryParams" doc:id="99e7dbcc-93ab-4f22-ad18-acc07125c545" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+
+
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="fileName" ><![CDATA[%dw 2.0
+output application/json
+---
+attributes.queryParams.file default "examples/flightsToLAX.json"
+]]></ee:set-variable>
+				<ee:set-variable variableName="format" ><![CDATA[%dw 2.0
+output application/json
+
+var format = (attributes.queryParams.file splitBy ".")[1]
+
+---
+attributes.queryParams.format default format default "json"
+
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="f8b34611-3033-4ce4-bbde-79f59cdb6824" >
+			<when expression='lower(vars.format)  contains "xml"'>
+				<set-payload value='#[output application/xml --- readUrl("classpath:///" ++ vars.fileName, "application/xml")]' doc:name="Set Payload" doc:id="2830fe49-649c-4861-8158-89aaeda1232b" />
+			</when>
+			<when expression='lower(vars.format)  contains "csv"'>
+				<set-payload value='#[output application/csv --- readUrl("classpath:///" ++ vars.fileName, "application/csv")]' doc:name="Set Payload" doc:id="f7889adb-016e-4b15-ac90-7622ce5e70bd" />
+			</when>
+			<when expression='lower(vars.format)  contains "dw"'>
+				<set-payload value='#[output application/dw --- readUrl("classpath:///" ++ vars.fileName, "application/dw")]' doc:name="Set Payload" doc:id="42026787-a332-42d6-9473-3b3e868aa004" />
+			</when>
+			<when expression='lower(vars.format)  contains "json"'>
+				<set-payload value='#[output application/json --- readUrl("classpath:///" ++ vars.fileName, "application/json")]' doc:name="Set Payload" doc:id="f8e8653d-6f5b-4ace-a460-5e709eb41d20" />
+			</when>
+			<otherwise>
+				<set-payload value="#[output text/plain --- payload]" doc:name="Set Payload" doc:id="42fe2a2f-6875-4b7a-997f-a57675b64b3a" />
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="getSampleDataFilesFlow1" doc:id="7dcda2e4-d7ab-4dcf-ad4e-9f89f65ddb93" >
+		<http:listener doc:name="Listener" doc:id="70f400c8-3d43-467d-ab77-62df5191cc2b" config-ref="HTTP_Listener_config" path="getBinaryData"/>
+		<ee:transform doc:name="Set fileName and format vars from queryParams" doc:id="96dec059-ad1d-44b2-9bae-d54a39012eed" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+
+
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="fileName" ><![CDATA[%dw 2.0
+output application/json
+---
+attributes.queryParams.file default "examples/flightsToLAX.json"
+]]></ee:set-variable>
+				<ee:set-variable variableName="format" ><![CDATA[%dw 2.0
+output application/json
+
+var format = (attributes.queryParams.file splitBy ".")[1]
+
+---
+attributes.queryParams.format default format default "json"
+
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<set-payload value='#[output text/plain with binary&#10;&#10;&#10;import * from dw::core::Strings&#10;&#10;&#10;var splitFileName = vars.fileName splitBy   "."&#10;&#10;var fileFormat = splitFileName[1]&#10;&#10;var fileName = splitFileName[0]&#10;&#10;var readFile =  fileFormat match {&#10;	&#10;	case xml if( lower(fileFormat) ~= "xml" ) -&gt; readUrl("classpath:///$(fileName).$(fileFormat)", "application/xml")&#10;	&#10;	case csv if( lower(fileFormat) ~= "csv" ) -&gt; readUrl("classpath:///$(fileName).$(fileFormat)", "application/csv")&#10;	&#10;	case java if( lower(fileFormat) ~= "java" ) -&gt; readUrl("classpath:///$(fileName).$(fileFormat)", "application/java")&#10;	&#10;	case yaml if( lower(fileFormat) ~= "yaml" ) -&gt; readUrl("classpath:///$(fileName).$(fileFormat)", "application/yaml")&#10;	&#10;	case prop if( lower(fileFormat) contains "prop" ) -&gt; readUrl("classpath:///$(fileName).$(fileFormat)", "text/plain")&#10;	&#10;	case properties if( lower(fileFormat) ~= "properties" ) -&gt; readUrl("classpath:///$(fileName).$(fileFormat)", "text/x-java-properties")&#10;	&#10;	case html if( lower(fileFormat) ~= "html" ) -&gt; readUrl("classpath:///$(fileName).$(fileFormat)", "text/html")&#10;		&#10;	else -&gt;   readUrl("classpath:///$(fileName).$(fileFormat)", "application/json")&#10;	&#10;}&#10;&#10;---&#10;write(readFile, "application/$(fileFormat)")]' doc:name="Set Payload" doc:id="11b075b0-1c40-43de-b6c2-e6b337210db3" />
+	</flow>
+</mule>

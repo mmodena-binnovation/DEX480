@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_3a168865_95f3_4de7_88fc_2c23cae436cf_Input_Variables_allSfoFlights = Array<{|  flightCode: String,   availableSeats: Number,   destination: String,   planeType: String,   origination: String,   price: Number,   departureDate: String,   airlineName: String|}>
+

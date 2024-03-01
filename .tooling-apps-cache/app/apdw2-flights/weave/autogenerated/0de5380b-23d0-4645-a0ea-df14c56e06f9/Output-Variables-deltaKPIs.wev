@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_0de5380b_23d0_4645_a0ea_df14c56e06f9_Output_Variables_deltaKPIs = Number
+
